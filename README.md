@@ -50,6 +50,8 @@ mockExample.expect.bar.toReturn(valuesFrom: range)
 range.map { _ in mockExample.bar } // 0, 1, 2, 3, 4
 ```
 
+See the Playground for more examples.
+
 ## How It Works
-This uses the new `dynamicMember and `dynamicCallable` language features added in Swift 4.2 and 5 respectively. These dynamic methods allow the mocking DSL to be much more dynamic while also reducing the amount of boilerplate mocking code you need to write.
+This uses the new `dynamicMember` and `dynamicCallable` language features added in Swift 4.2 and 5. These dynamic methods drastically reduce the amount of boilerplate mocking code you need to write while also eliminating stringly-typed dynamic mocks.
 
