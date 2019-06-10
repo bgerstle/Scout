@@ -23,17 +23,17 @@ class MockExample : Example, Mockable {
     }
 }
 
-var mf = MockExample()
+var mockExample = MockExample()
 
-mf.expect
+mockExample.expect
     .foo
     .toReturn("bar")
     .and.toReturn("baz")
 
-mf.foo
-mf.foo
+mockExample.foo
+mockExample.foo
 
 let range = Array(0..<5)
-mf.expect.bar.toReturn(valuesFrom: range)
+mockExample.expect.bar.toReturn(valuesFrom: range)
 
-range.map { _ in mf.bar }
+range.map { _ in mockExample.bar }
