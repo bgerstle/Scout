@@ -41,7 +41,7 @@ public struct ExpectDSL {
 
         // Declared as var because `args` are set after the recorder is returned as a
         // dynamicMemmber of ExpectDSL.
-        var args: [Any?] = []
+        var argMatchers: [Matcher]! = nil
 
         init(mock: Mock, funcName: String) {
             self.mock = mock
@@ -49,11 +49,13 @@ public struct ExpectDSL {
         }
 
         internal func checkArgs(args: [Any?]) {
-            for (actual, expected) in zip(args, self.args) {
-                let expectedType = type(of: expected)
-                let actualType = type(of: actual)
-                // somehow figure out if the two are equatable and compare them?...
+            fail(unless: args.count == self.argMatchers.count,
+                 "Expected \(self.argMatchers.count) arguments, but got \(args.count)")
+            let mistmatchedArgsAndMatchers = zip(args, self.argMatchers).filter { (arg, matcher) in
+                return !matcher.matches(arg: arg)
             }
+            fail(unless: mistmatchedArgsAndMatchers.count == 0,
+                 "Arguments to \(funcName) didn't match: \(mistmatchedArgsAndMatchers)")
         }
 
         public struct FuncDSL {
@@ -62,19 +64,26 @@ public struct ExpectDSL {
 
             @discardableResult
             public func toReturn(_ value: Any?) -> FuncDSL {
-                return andDo({ args in value })
+                return andDo { args in
+                    value
+                }
             }
 
+            // TODO: use some code generator to make polyvariadic version of `andDo` which
+            // constrains its type parameters to Equatable? Or, some sort of AnyEquatable
+            // wrapper that allows for comparison?
             @discardableResult
             public func andDo(_ block: @escaping ([Any?]) -> Any?) -> FuncDSL {
-                // TODO: add arg matching
-                mock.append(expectation: FuncExpectation(action: block), for: argRecorder.funcName)
+                mock.append(expectation: FuncExpectation { args in
+                    self.argRecorder.checkArgs(args: args)
+                    return block(args)
+                }, for: argRecorder.funcName)
                 return self
             }
         }
 
-        public func dynamicallyCall(withArguments args: [Any?]) -> FuncDSL {
-            self.args = args
+        public func dynamicallyCall(withArguments matchers: [Matcher]) -> FuncDSL {
+            self.argMatchers = matchers
             return FuncDSL(mock: mock, argRecorder: self)
         }
     }
@@ -89,6 +98,30 @@ public struct ExpectDSL {
         get {
             return FuncArgRecorder(mock: mock, funcName: member)
         }
+    }
+}
+
+public protocol Matcher {
+    func matches(arg: Any?) -> Bool
+}
+
+func equalTo<T: Equatable>(_ value: T?) -> Matcher {
+    return EqualityMatcher(value: value)
+}
+
+public class EqualityMatcher<T: Equatable>: Matcher, CustomStringConvertible {
+    let value: T?
+
+    init(value: T?) {
+        self.value = value
+    }
+
+    public func matches(arg: Any?) -> Bool {
+        return value == nil && arg == nil || (arg as? T) == value
+    }
+
+    public var description: String {
+        return "Equal to \(String(describing: value))"
     }
 }
 

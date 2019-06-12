@@ -36,6 +36,10 @@ class MockExample : Example, Mockable {
         // the function type for baz...
         return mock.call.baz() as! String
     }
+
+    func buz(_ value: Int) {
+        mock.call.buz(value)
+    }
 }
 
 class ScoutTests: XCTestCase {
@@ -69,8 +73,11 @@ class ScoutTests: XCTestCase {
     func testReturningValueFromFunctionCall() {
         mockExample.expect.baz().andDo { _ in "baz return" }
         XCTAssertEqual(mockExample.baz(), "baz return")
-
     }
 
-    // TODO: add unhappy path tests (expected assertion failures)
+    func testWrongNumberOfArgs() {
+        mockExample.expect.buz(equalTo(0)).andDo { _ in }
+
+        mockExample.buz(1)
+    }
 }

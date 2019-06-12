@@ -14,6 +14,8 @@
 		BC74E05A22B127170054AB2E /* VarDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC74E05922B127170054AB2E /* VarDSL.swift */; };
 		BC74E05C22B1272C0054AB2E /* CallDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC74E05B22B1272C0054AB2E /* CallDSL.swift */; };
 		BC74E05E22B1274D0054AB2E /* ExpectDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC74E05D22B1274D0054AB2E /* ExpectDSL.swift */; };
+		BC74E06022B1794E0054AB2E /* MockFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC74E05F22B1794E0054AB2E /* MockFailure.swift */; };
+		BC74E06322B179610054AB2E /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC74E06222B179610054AB2E /* XCTest.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +39,8 @@
 		BC74E05922B127170054AB2E /* VarDSL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VarDSL.swift; sourceTree = "<group>"; };
 		BC74E05B22B1272C0054AB2E /* CallDSL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallDSL.swift; sourceTree = "<group>"; };
 		BC74E05D22B1274D0054AB2E /* ExpectDSL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpectDSL.swift; sourceTree = "<group>"; };
+		BC74E05F22B1794E0054AB2E /* MockFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockFailure.swift; sourceTree = "<group>"; };
+		BC74E06222B179610054AB2E /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,6 +48,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BC74E06322B179610054AB2E /* XCTest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -64,6 +69,7 @@
 				BC2FBC4B22AE9A0000D9EDDD /* Scout */,
 				BC2FBC5622AE9A0000D9EDDD /* ScoutTests */,
 				BC2FBC4A22AE9A0000D9EDDD /* Products */,
+				BC74E06122B179600054AB2E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -81,6 +87,7 @@
 			children = (
 				BC2FBC4C22AE9A0000D9EDDD /* Scout.h */,
 				BC2FBC6422AE9E9300D9EDDD /* Mock.swift */,
+				BC74E05F22B1794E0054AB2E /* MockFailure.swift */,
 				BC74E05D22B1274D0054AB2E /* ExpectDSL.swift */,
 				BC74E05B22B1272C0054AB2E /* CallDSL.swift */,
 				BC74E05922B127170054AB2E /* VarDSL.swift */,
@@ -96,6 +103,14 @@
 				BC2FBC5922AE9A0000D9EDDD /* Info.plist */,
 			);
 			path = ScoutTests;
+			sourceTree = "<group>";
+		};
+		BC74E06122B179600054AB2E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BC74E06222B179610054AB2E /* XCTest.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -208,6 +223,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BC2FBC6522AE9E9300D9EDDD /* Mock.swift in Sources */,
+				BC74E06022B1794E0054AB2E /* MockFailure.swift in Sources */,
 				BC74E05C22B1272C0054AB2E /* CallDSL.swift in Sources */,
 				BC74E05E22B1274D0054AB2E /* ExpectDSL.swift in Sources */,
 				BC74E05A22B127170054AB2E /* VarDSL.swift in Sources */,
@@ -365,12 +381,21 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Scout/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"-weak_framework",
+					XCTest,
+					"-weak-lswiftXCTest",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.bgerstle.Scout;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -391,12 +416,21 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
+				);
 				INFOPLIST_FILE = Scout/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"-weak_framework",
+					XCTest,
+					"-weak-lswiftXCTest",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.bgerstle.Scout;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
