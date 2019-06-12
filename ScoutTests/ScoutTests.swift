@@ -20,20 +20,21 @@ class MockExample : Example, Mockable {
 
     var foo: String {
         get {
-            return mock.foo
+            return mock.get.foo
         }
     }
 
     var bar: Int {
         get {
-            return mock.bar
+            return mock.get.bar
         }
     }
 
     func baz() -> String {
-        // FIXME: this casting as fuuuuugly. maybe some DSL like mock.call to enter dynamicCallable
-        // with a templated return type?
-        return (mock.baz as ([Any?]) -> Any?)([]) as! String
+        // for some reason, swiftc segfaults if dynamicallyCall() is generic. if it was
+        // generic, you wouldn't need the `as! String`, but at least you don't need to cast
+        // the function type for baz...
+        return mock.call.baz() as! String
     }
 }
 
@@ -70,4 +71,6 @@ class ScoutTests: XCTestCase {
         XCTAssertEqual(mockExample.baz(), "baz return")
 
     }
+
+    // TODO: add unhappy path tests (expected assertion failures)
 }

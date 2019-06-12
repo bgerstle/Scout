@@ -10,7 +10,10 @@
 		BC2FBC5322AE9A0000D9EDDD /* Scout.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC2FBC4922AE9A0000D9EDDD /* Scout.framework */; };
 		BC2FBC5822AE9A0000D9EDDD /* ScoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2FBC5722AE9A0000D9EDDD /* ScoutTests.swift */; };
 		BC2FBC5A22AE9A0000D9EDDD /* Scout.h in Headers */ = {isa = PBXBuildFile; fileRef = BC2FBC4C22AE9A0000D9EDDD /* Scout.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		BC2FBC6522AE9E9300D9EDDD /* Mockable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2FBC6422AE9E9300D9EDDD /* Mockable.swift */; };
+		BC2FBC6522AE9E9300D9EDDD /* Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2FBC6422AE9E9300D9EDDD /* Mock.swift */; };
+		BC74E05A22B127170054AB2E /* VarDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC74E05922B127170054AB2E /* VarDSL.swift */; };
+		BC74E05C22B1272C0054AB2E /* CallDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC74E05B22B1272C0054AB2E /* CallDSL.swift */; };
+		BC74E05E22B1274D0054AB2E /* ExpectDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC74E05D22B1274D0054AB2E /* ExpectDSL.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,7 +33,10 @@
 		BC2FBC5222AE9A0000D9EDDD /* ScoutTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScoutTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC2FBC5722AE9A0000D9EDDD /* ScoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoutTests.swift; sourceTree = "<group>"; };
 		BC2FBC5922AE9A0000D9EDDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		BC2FBC6422AE9E9300D9EDDD /* Mockable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mockable.swift; sourceTree = "<group>"; };
+		BC2FBC6422AE9E9300D9EDDD /* Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mock.swift; sourceTree = "<group>"; };
+		BC74E05922B127170054AB2E /* VarDSL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VarDSL.swift; sourceTree = "<group>"; };
+		BC74E05B22B1272C0054AB2E /* CallDSL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallDSL.swift; sourceTree = "<group>"; };
+		BC74E05D22B1274D0054AB2E /* ExpectDSL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpectDSL.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,7 +80,10 @@
 			isa = PBXGroup;
 			children = (
 				BC2FBC4C22AE9A0000D9EDDD /* Scout.h */,
-				BC2FBC6422AE9E9300D9EDDD /* Mockable.swift */,
+				BC2FBC6422AE9E9300D9EDDD /* Mock.swift */,
+				BC74E05D22B1274D0054AB2E /* ExpectDSL.swift */,
+				BC74E05B22B1272C0054AB2E /* CallDSL.swift */,
+				BC74E05922B127170054AB2E /* VarDSL.swift */,
 				BC2FBC4D22AE9A0000D9EDDD /* Info.plist */,
 			);
 			path = Scout;
@@ -198,7 +207,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BC2FBC6522AE9E9300D9EDDD /* Mockable.swift in Sources */,
+				BC2FBC6522AE9E9300D9EDDD /* Mock.swift in Sources */,
+				BC74E05C22B1272C0054AB2E /* CallDSL.swift in Sources */,
+				BC74E05E22B1274D0054AB2E /* ExpectDSL.swift in Sources */,
+				BC74E05A22B127170054AB2E /* VarDSL.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
