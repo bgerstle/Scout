@@ -5,6 +5,8 @@ import Scout
 protocol Example {
     var foo: String { get }
     var bar: Int { get }
+
+    func baz() -> String
 }
 
 class MockExample : Example, Mockable {
@@ -20,6 +22,10 @@ class MockExample : Example, Mockable {
         get {
             return mock.bar
         }
+    }
+
+    func baz() -> String {
+        return mock.baz()
     }
 }
 
@@ -37,3 +43,7 @@ let range = Array(0..<5)
 mockExample.expect.bar.toReturn(valuesFrom: range)
 
 range.map { _ in mockExample.bar }
+
+mockExample.expect.baz().andDo("baz return")
+
+mockExample.baz()
