@@ -16,6 +16,8 @@
 		BC74E05E22B1274D0054AB2E /* ExpectDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC74E05D22B1274D0054AB2E /* ExpectDSL.swift */; };
 		BC74E06022B1794E0054AB2E /* MockFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC74E05F22B1794E0054AB2E /* MockFailure.swift */; };
 		BC74E06322B179610054AB2E /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC74E06222B179610054AB2E /* XCTest.framework */; };
+		BC74E06522B310E90054AB2E /* ExpectVarDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC74E06422B310E90054AB2E /* ExpectVarDSL.swift */; };
+		BC74E06722B311080054AB2E /* ExpectFuncDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC74E06622B311080054AB2E /* ExpectFuncDSL.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +43,8 @@
 		BC74E05D22B1274D0054AB2E /* ExpectDSL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpectDSL.swift; sourceTree = "<group>"; };
 		BC74E05F22B1794E0054AB2E /* MockFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockFailure.swift; sourceTree = "<group>"; };
 		BC74E06222B179610054AB2E /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		BC74E06422B310E90054AB2E /* ExpectVarDSL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpectVarDSL.swift; sourceTree = "<group>"; };
+		BC74E06622B311080054AB2E /* ExpectFuncDSL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpectFuncDSL.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +93,8 @@
 				BC2FBC6422AE9E9300D9EDDD /* Mock.swift */,
 				BC74E05F22B1794E0054AB2E /* MockFailure.swift */,
 				BC74E05D22B1274D0054AB2E /* ExpectDSL.swift */,
+				BC74E06622B311080054AB2E /* ExpectFuncDSL.swift */,
+				BC74E06422B310E90054AB2E /* ExpectVarDSL.swift */,
 				BC74E05B22B1272C0054AB2E /* CallDSL.swift */,
 				BC74E05922B127170054AB2E /* VarDSL.swift */,
 				BC2FBC4D22AE9A0000D9EDDD /* Info.plist */,
@@ -224,6 +230,8 @@
 			files = (
 				BC2FBC6522AE9E9300D9EDDD /* Mock.swift in Sources */,
 				BC74E06022B1794E0054AB2E /* MockFailure.swift in Sources */,
+				BC74E06722B311080054AB2E /* ExpectFuncDSL.swift in Sources */,
+				BC74E06522B310E90054AB2E /* ExpectVarDSL.swift in Sources */,
 				BC74E05C22B1272C0054AB2E /* CallDSL.swift in Sources */,
 				BC74E05E22B1274D0054AB2E /* ExpectDSL.swift in Sources */,
 				BC74E05A22B127170054AB2E /* VarDSL.swift in Sources */,

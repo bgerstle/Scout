@@ -78,8 +78,8 @@ class ScoutTests: XCTestCase {
     func testReturningVarForMember() {
         mockExample
             .expect.foo
-            .toReturn("bar")
-            .and.toReturn("baz")
+            .to(return: "bar")
+            .and.to(return: "baz")
 
         XCTAssertEqual(mockExample.foo, "bar")
         XCTAssertEqual(mockExample.foo, "baz")
@@ -87,18 +87,18 @@ class ScoutTests: XCTestCase {
 
     func testReturningValuesFromSequence() {
         let range = Array(0..<5)
-        mockExample.expect.bar.toReturn(valuesFrom: range)
+        mockExample.expect.bar.to(returnValuesFrom: range)
 
         XCTAssertEqual(range.map { _ in mockExample.bar }, [0,1,2,3,4])
     }
 
     func testReturningValueFromFunctionCall() {
-        mockExample.expect.baz().andDo { _ in "baz return" }
+        mockExample.expect.baz().to { _ in "baz return" }
         XCTAssertEqual(mockExample.baz(), "baz return")
     }
 
     func testWrongNumberOfArgs() {
-        mockExample.expect.buz(equalTo(0)).andDo { _ in }
+        mockExample.expect.buz(equalTo(0)).to(return: ())
 
         captureTestFailure(mockExample.buz(1)) { failureDescription in
             XCTAssert(failureDescription.contains("Arguments to buz didn't match"))
