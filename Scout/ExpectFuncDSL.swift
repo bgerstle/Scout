@@ -13,8 +13,8 @@ public class ExpectFuncDSL {
     let mock: Mock
     let funcName: String
 
-    // Declared as var because `args` are set after the recorder is returned as a
-    // dynamicMemmber of ExpectDSL.
+    // Declared as var because `argMatchers` are set when the dynamicCallable is called (after
+    // ExpectFuncDSL is returned as a dynamicMember of ExpectDSL).
     var argMatchers: [Matcher]! = nil
 
     init(mock: Mock, funcName: String) {
