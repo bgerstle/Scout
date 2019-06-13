@@ -18,11 +18,11 @@ public struct CallDSL {
         let mock: Mock
         let member: String
 
+        // TODO: Make this generic once the Swift compiler stops segfaulting.
         public func dynamicallyCall(withArguments args: [Any?]) -> Any! {
             let expectationValue = mock.next(expectationFor: member)
             guard let action = expectationValue as? ([Any?]) -> Any? else {
-                recordFailure("Failed to cast action of function expectation for \(member)")
-                return nil
+                fatalError("Failed to cast action of function expectation for \(member)")
             }
             return action(args)
         }

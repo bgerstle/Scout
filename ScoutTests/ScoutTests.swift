@@ -32,9 +32,6 @@ class MockExample : Example, Mockable {
     }
 
     func baz() -> String {
-        // for some reason, swiftc segfaults if dynamicallyCall() is generic. if it was
-        // generic, you wouldn't need the `as! String`, but at least you don't need to cast
-        // the function type for baz...
         return mock.call.baz() as! String
     }
 
