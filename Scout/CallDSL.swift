@@ -21,7 +21,8 @@ public struct CallDSL {
         public func dynamicallyCall(withArguments args: [Any?]) -> Any! {
             let expectationValue = mock.next(expectationFor: member)
             guard let action = expectationValue as? ([Any?]) -> Any? else {
-                fatalError("Failed to cast action of function expectation for \(member)")
+                recordFailure("Failed to cast action of function expectation for \(member)")
+                return nil
             }
             return action(args)
         }
@@ -31,15 +32,5 @@ public struct CallDSL {
         get {
             return MockCall(mock: mock, member: member)
         }
-    }
-}
-
-extension Mock {
-    // Returns a dynamic member proxy that can be used to invoke function call stubs. For example:
-    //
-    //   mock.call.bar()
-    //
-    var call: CallDSL {
-        return CallDSL(mock: self)
     }
 }

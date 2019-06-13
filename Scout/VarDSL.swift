@@ -19,20 +19,10 @@ public struct VarDSL {
                 return nil
             }
             guard let typedValue = value as? T else {
-                assertionFailure("Expected value of type \(T.self) for \(member), got \(type(of: value))")
-                fatalError()
+                recordFailure("Expected value of type \(T.self) for \(member), got \(type(of: value))")
+                return nil
             }
             return typedValue
         }
-    }
-}
-
-extension Mock {
-    // Returns a dynamic member proxy that can be used to access var stubs. For example:
-    //
-    //   mock.get.foo
-    //
-    var get: VarDSL {
-        return VarDSL(mock: self)
     }
 }

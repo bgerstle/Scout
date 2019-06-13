@@ -17,14 +17,14 @@ protocol Expectation: class {
 public class Mock {
     public init() { }
 
-    private var varExpectations: [String: [Expectation]] = [:]
+    private var memberExpectations: [String: [Expectation]] = [:]
 
     internal func append(expectation: Expectation, for member: String) {
-        varExpectations[member] = varExpectations[member, default: []] + [expectation]
+        memberExpectations[member] = memberExpectations[member, default: []] + [expectation]
     }
 
     internal func next(expectationFor member: String) -> Any? {
-        guard let expectations = varExpectations[member] else {
+        guard let expectations = memberExpectations[member] else {
             recordFailure("No actions defined for member \(member)")
             return nil
         }
@@ -33,8 +33,26 @@ public class Mock {
         let value = expectation.nextValue()
         // remove expectation if all its values have been consumed
         if !expectation.hasNext() {
-            varExpectations[member]!.removeFirst()
+            memberExpectations[member]!.removeFirst()
         }
         return value
+    }
+
+    /*
+    Returns a dynamic member proxy that can be used to access var stubs. For example:
+
+       mock.get.foo
+    */
+    var get: VarDSL {
+        return VarDSL(mock: self)
+    }
+
+    /*
+    Returns a dynamic member proxy that can be used to invoke function call stubs. For example:
+
+       mock.call.bar()
+    */
+    var call: CallDSL {
+        return CallDSL(mock: self)
     }
 }
