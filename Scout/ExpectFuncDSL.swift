@@ -43,6 +43,11 @@ public class ExpectFuncDSL {
             }
         }
 
+        @discardableResult
+        public func toBeCalled() -> FuncDSL {
+            return to { }
+        }
+
         // TODO: use some code generator to make polyvariadic version of `andDo` which
         // constrains its type parameters to Equatable? Or, some sort of AnyEquatable
         // wrapper that allows for comparison?

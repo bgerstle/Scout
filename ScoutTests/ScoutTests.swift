@@ -99,7 +99,7 @@ class ScoutTests: XCTestCase {
     }
 
     func testWrongNumberOfArgs() {
-        mockExample.expect.buz(equalTo(0)).to(return: ())
+        mockExample.expect.buz(equalTo(0)).toBeCalled()
 
         captureTestFailure(mockExample.buz(1)) { failureDescription in
             XCTAssert(failureDescription.contains("Arguments to buz didn't match"))
