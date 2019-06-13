@@ -44,13 +44,30 @@ class MockExample : Example, Mockable {
 
 class ScoutTests: XCTestCase {
     var mockExample: MockExample!
+    var assertTestFailureBlock: ((String) -> Void)! = nil
 
     override func setUp() {
         mockExample = MockExample()
+        continueAfterFailure = false
+        assertTestFailureBlock = nil
     }
 
     override func tearDown() {
         mockExample = nil
+    }
+
+    override func recordFailure(withDescription description: String, inFile filePath: String, atLine lineNumber: Int, expected: Bool) {
+        if let block = assertTestFailureBlock {
+            assertTestFailureBlock = nil
+            block(description)
+        } else {
+            super.recordFailure(withDescription: description, inFile: filePath, atLine: lineNumber, expected: expected)
+        }
+    }
+
+    func captureTestFailure(_ expression: @autoclosure () -> Void, _ assertion: @escaping (String) -> Void) {
+        assertTestFailureBlock = assertion
+        expression()
     }
 
     func testReturningVarForMember() {
@@ -78,6 +95,8 @@ class ScoutTests: XCTestCase {
     func testWrongNumberOfArgs() {
         mockExample.expect.buz(equalTo(0)).andDo { _ in }
 
-        mockExample.buz(1)
+        captureTestFailure(mockExample.buz(1)) { failureDescription in
+            XCTAssert(failureDescription.contains("Arguments to buz didn't match"))
+        }
     }
 }
