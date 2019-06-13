@@ -8,6 +8,7 @@
 
 import XCTest
 @testable import Scout
+
 protocol Example {
     var foo: String { get }
     var bar: Int { get }
@@ -56,23 +57,30 @@ class ScoutTests: XCTestCase {
         mockExample = nil
     }
 
-    override func recordFailure(withDescription description: String, inFile filePath: String, atLine lineNumber: Int, expected: Bool) {
+    override func recordFailure(withDescription description: String,
+                                inFile filePath: String,
+                                atLine lineNumber: Int,
+                                expected: Bool) {
         if let block = assertTestFailureBlock {
             assertTestFailureBlock = nil
             block(description)
         } else {
-            super.recordFailure(withDescription: description, inFile: filePath, atLine: lineNumber, expected: expected)
+            super.recordFailure(withDescription: description,
+                                inFile: filePath,
+                                atLine: lineNumber,
+                                expected: expected)
         }
     }
 
-    func captureTestFailure(_ expression: @autoclosure () -> Void, _ assertion: @escaping (String) -> Void) {
+    func captureTestFailure(_ expression: @autoclosure () -> Void,
+                            _ assertion: @escaping (String) -> Void) {
         assertTestFailureBlock = assertion
         expression()
     }
 
     func testReturningVarForMember() {
-        mockExample.expect
-            .foo
+        mockExample
+            .expect.foo
             .toReturn("bar")
             .and.toReturn("baz")
 
