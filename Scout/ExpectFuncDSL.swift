@@ -48,9 +48,6 @@ public class ExpectFuncDSL {
             return to { }
         }
 
-        // TODO: use some code generator to make polyvariadic version of `andDo` which
-        // constrains its type parameters to Equatable? Or, some sort of AnyEquatable
-        // wrapper that allows for comparison?
         @discardableResult
         public func to(do block: @escaping ([Any?]) -> Any?) -> FuncDSL {
             mock.append(expectation: FuncExpectation { args in
