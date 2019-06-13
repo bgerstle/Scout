@@ -11,7 +11,8 @@ import Scout
 
 protocol Example {
     var foo: String { get }
-    var bar: Int { get }
+
+    func baz() -> String
 }
 
 class MockExample : Example, Mockable {
@@ -19,14 +20,12 @@ class MockExample : Example, Mockable {
 
     var foo: String {
         get {
-            return mock.foo
+            return mock.get.foo
         }
     }
 
-    var bar: Int {
-        get {
-            return mock.bar
-        }
+    func baz() -> String {
+        return mock.call.baz() as! String
     }
 }
 ```
@@ -36,18 +35,15 @@ And stub some return values:
 ```swift
 var mockExample = MockExample()
 
-mockExample.expect
-    .foo
-    .toReturn("bar")
-    .and.toReturn("baz")
+mockExample
+    .expect.foo
+    .to(return: "bar")
 
 mockExample.foo // "bar"
-mockExample.foo // "baz"
 
-let range = Array(0..<5)
-mockExample.expect.bar.toReturn(valuesFrom: range)
+mockExample.expect.baz().to(return: "buz")
 
-range.map { _ in mockExample.bar } // 0, 1, 2, 3, 4
+mockExample.baz() // "buz"
 ```
 
 See the Playground for more examples.

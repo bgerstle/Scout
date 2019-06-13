@@ -11,9 +11,10 @@ import XCTest
 
 protocol Example {
     var foo: String { get }
-    var bar: Int { get }
 
     func baz() -> String
+
+    var bar: Int { get }
 }
 
 class MockExample : Example, Mockable {
@@ -93,7 +94,7 @@ class ScoutTests: XCTestCase {
     }
 
     func testReturningValueFromFunctionCall() {
-        mockExample.expect.baz().to { _ in "baz return" }
+        mockExample.expect.baz().to(return: "baz return")
         XCTAssertEqual(mockExample.baz(), "baz return")
     }
 
