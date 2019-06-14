@@ -12,11 +12,11 @@ public protocol ArgMatcher {
     func matches(arg: Any?) -> Bool
 }
 
-func equalTo<T: Equatable>(_ value: T?) -> ArgMatcher {
+public func equalTo<T: Equatable>(_ value: T?) -> ArgMatcher {
     return EqualityMatcher(value: value)
 }
 
-public class EqualityMatcher<T: Equatable> : ArgMatcher, CustomStringConvertible {
+class EqualityMatcher<T: Equatable> : ArgMatcher, CustomStringConvertible {
     let value: T?
 
     init(value: T?) {
@@ -36,7 +36,7 @@ public func any() -> ArgMatcher {
     return AnyMatcher()
 }
 
-public class AnyMatcher : ArgMatcher {
+class AnyMatcher : ArgMatcher {
     public func matches(arg: Any?) -> Bool {
         return true
     }
@@ -46,7 +46,7 @@ public func satisfies(_ predicate: @escaping (Any?) -> Bool) -> ArgMatcher {
     return SatisfiesMatcher(predicate: predicate)
 }
 
-public class SatisfiesMatcher : ArgMatcher, CustomStringConvertible {
+class SatisfiesMatcher : ArgMatcher, CustomStringConvertible {
     let predicate: (Any?) -> Bool
 
     init(predicate: @escaping (Any?) -> Bool) {

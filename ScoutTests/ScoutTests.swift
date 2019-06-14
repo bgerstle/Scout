@@ -17,6 +17,8 @@ protocol Example {
     var bar: Int { get }
 
     func biz() throws
+
+    func buz(_ value: Int)
 }
 
 struct ExampleError : Error {

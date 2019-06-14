@@ -25,7 +25,7 @@ class MockExample : Example, Mockable {
     }
 
     func baz() -> String {
-        return mock.call.baz() as! String
+        return try! mock.call.baz() as! String
     }
 }
 ```
@@ -48,6 +48,4 @@ mockExample.baz() // "buz"
 
 See the Playground for more examples.
 
-## How It Works
-This uses the new `dynamicMember` and `dynamicCallable` language features added in Swift 4.2 and 5. These dynamic methods drastically reduce the amount of boilerplate mocking code you need to write while also eliminating stringly-typed dynamic mocks.
 

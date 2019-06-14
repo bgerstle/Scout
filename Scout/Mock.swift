@@ -43,7 +43,7 @@ public class Mock {
 
        mock.get.foo
     */
-    var get: VarDSL {
+    public var get: VarDSL {
         return VarDSL(mock: self)
     }
 
@@ -52,7 +52,7 @@ public class Mock {
 
        mock.call.bar()
     */
-    var call: CallDSL {
+    public var call: CallDSL {
         return CallDSL(mock: self)
     }
 }
