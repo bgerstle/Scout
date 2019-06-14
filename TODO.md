@@ -1,12 +1,15 @@
 # To Do
 
 ## Future versions
-- [ ] Nimble matching integration
+- [ ] Quick/Nimble integration
+- [ ] Swift package support
+- [ ] macOS support
 
 ## v0.1
 - [x] Stub simple var return values
-- [ ] Replace assertion failures with XCTest failure reports
-- [ ] Support "always return"
-- [ ] Stub expected instance method calls and return values
-- [ ] Verify expected instance method calls
+- [x] Replace assertion failures with XCTest failure reports
+- [x] Support "always return"
+- [x] Stub expected instance method calls and return values
+- [x] Verify expected instance method calls
 - [ ] Stub side effects (e.g. exception throwing) for methods
+- [ ] Report mock failures with file & line of call site
