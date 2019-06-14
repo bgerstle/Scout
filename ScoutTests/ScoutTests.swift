@@ -70,10 +70,10 @@ class ScoutTests: XCTestCase {
         }
     }
 
-    func captureTestFailure(_ expression: @autoclosure () -> Void,
+    func captureTestFailure<T>(_ expression: @autoclosure () -> T,
                             _ assertion: @escaping (String) -> Void) {
         assertTestFailureBlock = assertion
-        expression()
+        let _ = expression()
     }
 
     func testReturningVarForMember() {
@@ -99,10 +99,33 @@ class ScoutTests: XCTestCase {
     }
 
     func testWrongNumberOfArgs() {
+        mockExample.expect.baz(any()).to(return: "baz return")
+
+        captureTestFailure(mockExample.baz()) { failureDescription in
+            XCTAssert(failureDescription.contains("Expected 1 arguments, but got 0"))
+        }
+    }
+
+    func testArgMatchFailure() {
         mockExample.expect.buz(equalTo(0)).toBeCalled()
 
         captureTestFailure(mockExample.buz(1)) { failureDescription in
             XCTAssert(failureDescription.contains("Arguments to buz didn't match"))
+        }
+    }
+
+    func testPredicateMatcher() {
+        mockExample.expect.buz(satisfies { arg in
+            guard let i = arg as? Int else {
+                return false
+            }
+            return i % 2 == 0
+        }).toBeCalled(times: 2)
+
+        mockExample.buz(2)
+        captureTestFailure(mockExample.buz(1)) { failureDesription in
+            XCTAssert(failureDesription.contains("Arguments to buz didn't match"))
+            XCTAssert(failureDesription.contains("Matching predicate"))
         }
     }
 }

@@ -44,8 +44,9 @@ public class ExpectFuncDSL {
         }
 
         @discardableResult
-        public func toBeCalled() -> FuncDSL {
-            return to { }
+        public func toBeCalled(times: Int = 1) -> FuncDSL {
+            (0..<times).forEach { _ in to { } }
+            return self
         }
 
         @discardableResult
@@ -72,7 +73,7 @@ func equalTo<T: Equatable>(_ value: T?) -> Matcher {
     return EqualityMatcher(value: value)
 }
 
-public class EqualityMatcher<T: Equatable>: Matcher, CustomStringConvertible {
+public class EqualityMatcher<T: Equatable> : Matcher, CustomStringConvertible {
     let value: T?
 
     init(value: T?) {
@@ -85,5 +86,35 @@ public class EqualityMatcher<T: Equatable>: Matcher, CustomStringConvertible {
 
     public var description: String {
         return "Equal to \(String(describing: value))"
+    }
+}
+
+public func any() -> Matcher {
+    return AnyMatcher()
+}
+
+public class AnyMatcher : Matcher {
+    public func matches(arg: Any?) -> Bool {
+        return true
+    }
+}
+
+public func satisfies(_ predicate: @escaping (Any?) -> Bool) -> Matcher {
+    return SatisfiesMatcher(predicate: predicate)
+}
+
+public class SatisfiesMatcher : Matcher, CustomStringConvertible {
+    let predicate: (Any?) -> Bool
+
+    init(predicate: @escaping (Any?) -> Bool) {
+        self.predicate = predicate
+    }
+
+    public func matches(arg: Any?) -> Bool {
+        return predicate(arg)
+    }
+
+    public var description: String {
+        return "Matching predicate"
     }
 }
