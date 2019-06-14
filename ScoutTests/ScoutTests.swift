@@ -15,6 +15,12 @@ protocol Example {
     func baz() -> String
 
     var bar: Int { get }
+
+    func biz() throws
+}
+
+struct ExampleError : Error {
+
 }
 
 class MockExample : Example, Mockable {
@@ -33,11 +39,15 @@ class MockExample : Example, Mockable {
     }
 
     func baz() -> String {
-        return mock.call.baz() as! String
+        return try! mock.call.baz() as! String
     }
 
     func buz(_ value: Int) {
-        mock.call.buz(value)
+        try! mock.call.buz(value)
+    }
+
+    func biz() throws {
+        try mock.call.biz()
     }
 }
 
@@ -126,6 +136,16 @@ class ScoutTests: XCTestCase {
         captureTestFailure(mockExample.buz(1)) { failureDesription in
             XCTAssert(failureDesription.contains("Arguments to buz didn't match"))
             XCTAssert(failureDesription.contains("Matching predicate"))
+        }
+    }
+
+    func testFuncThrows() {
+        mockExample.expect.biz().toCall { _ in
+            throw ExampleError()
+        }
+
+        XCTAssertThrowsError(try mockExample.biz(), "Throws example error") { error in
+            XCTAssertTrue(error is ExampleError)
         }
     }
 }

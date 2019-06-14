@@ -11,5 +11,5 @@
 - [x] Support "always return"
 - [x] Stub expected instance method calls and return values
 - [x] Verify expected instance method calls
-- [ ] Stub side effects (e.g. exception throwing) for methods
+- [x] Stub side effects (e.g. exception throwing) for methods
 - [ ] Report mock failures with file & line of call site

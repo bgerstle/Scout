@@ -26,22 +26,6 @@ public struct ExpectDSL {
     }
 }
 
-class FuncExpectation: Expectation {
-    let action: ([Any?]) -> Any?
-
-    init(action: @escaping ([Any?]) -> Any?) {
-        self.action = action
-    }
-
-    func hasNext() -> Bool {
-        return false
-    }
-
-    func nextValue() -> Any? {
-        return action
-    }
-}
-
 // Sugar for any test class that has an embedded mock to add the "expect" DSL.
 public protocol Mockable {
     var mock: Mock { get }

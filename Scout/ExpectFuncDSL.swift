@@ -8,6 +8,22 @@
 
 import Foundation
 
+class FuncExpectation: Expectation {
+    let action: ([Any?]) throws -> Any?
+
+    init(action: @escaping ([Any?]) throws -> Any?) {
+        self.action = action
+    }
+
+    func hasNext() -> Bool {
+        return false
+    }
+
+    func nextValue() -> Any? {
+        return action
+    }
+}
+
 @dynamicCallable
 public class ExpectFuncDSL {
     let mock: Mock
@@ -38,7 +54,7 @@ public class ExpectFuncDSL {
 
         @discardableResult
         public func to(return value: Any?) -> FuncDSL {
-            return to { args in
+            return toCall { args in
                 value
             }
         }
@@ -50,10 +66,10 @@ public class ExpectFuncDSL {
         }
 
         @discardableResult
-        public func to(do block: @escaping ([Any?]) -> Any?) -> FuncDSL {
+        public func toCall(_ block: @escaping ([Any?]) throws -> Any?) -> FuncDSL {
             mock.append(expectation: FuncExpectation { args in
                 self.argRecorder.checkArgs(args: args)
-                return block(args)
+                return try block(args)
             }, for: argRecorder.funcName)
             return self
         }
