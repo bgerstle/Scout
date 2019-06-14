@@ -35,9 +35,7 @@ And stub some return values:
 ```swift
 var mockExample = MockExample()
 
-mockExample
-    .expect.foo
-    .to(return: "bar")
+mockExample.expect.foo.to(return: "bar")
 
 mockExample.foo // "bar"
 
@@ -47,5 +45,3 @@ mockExample.baz() // "buz"
 ```
 
 See the Playground for more examples.
-
-
