@@ -67,10 +67,16 @@ mockExample.expect.buz(equalTo(0)).toCall { args in
 
 mockExample.buz(0)
 
-struct SomeError: Error { }
-do {
-    mockExample.expect.biz().toCall { _ in throw SomeError() }
-    try mockExample.biz()
-} catch let error {
-    print("Caught \(error)")
-}
+//struct SomeError: Error { }
+//do {
+//    mockExample.expect.biz().toCall { _ in throw SomeError() }
+//    try mockExample.biz()
+//} catch let error {
+//    print("Caught \(error)")
+//}
+
+var mock = mockExample.mock
+
+var buz = mock.call.buz
+
+//try? buz(0, 1, 2)

@@ -135,6 +135,7 @@ class ScoutTests: XCTestCase {
         }).toBeCalled(times: 2)
 
         mockExample.buz(2)
+
         captureTestFailure(mockExample.buz(1)) { failureDesription in
             XCTAssert(failureDesription.contains("Arguments to buz didn't match"))
             XCTAssert(failureDesription.contains("Matching predicate"))

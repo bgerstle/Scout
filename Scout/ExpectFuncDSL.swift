@@ -24,8 +24,13 @@ class FuncExpectation: Expectation {
     }
 }
 
+protocol MockFuncContext {
+    var mock: Mock { get }
+    var funcName: String { get }
+}
+
 @dynamicCallable
-public class ExpectFuncDSL {
+public class ExpectFuncDSL : MockFuncContext {
     let mock: Mock
     let funcName: String
 
@@ -38,19 +43,14 @@ public class ExpectFuncDSL {
         self.funcName = funcName
     }
 
-    internal func checkArgs(args: [Any?]) {
-        fail(unless: args.count == self.argMatchers.count,
-             "Expected \(self.argMatchers.count) arguments, but got \(args.count)")
-        let mistmatchedArgsAndMatchers = zip(args, self.argMatchers).filter { (arg, matcher) in
-            return !matcher.matches(arg: arg)
-        }
-        fail(unless: mistmatchedArgsAndMatchers.count == 0,
-             "Arguments to \(funcName) didn't match: \(mistmatchedArgsAndMatchers)")
-    }
-
     public struct FuncDSL {
-        let mock: Mock
-        let argRecorder: ExpectFuncDSL
+        let context: MockFuncContext
+        let argChecker: PositionalArgChecker
+
+        init(context: MockFuncContext, matchers: [ArgMatcher]) {
+            self.context = context
+            self.argChecker = PositionalArgChecker(context: context, argMatchers: matchers)
+        }
 
         @discardableResult
         public func to(return value: Any?) -> FuncDSL {
@@ -67,16 +67,30 @@ public class ExpectFuncDSL {
 
         @discardableResult
         public func toCall(_ block: @escaping ([Any?]) throws -> Any?) -> FuncDSL {
-            mock.append(expectation: FuncExpectation { args in
-                self.argRecorder.checkArgs(args: args)
+            context.mock.append(expectation: FuncExpectation { args in
+                self.argChecker.checkArgs(args: args)
                 return try block(args)
-            }, for: argRecorder.funcName)
+            }, for: context.funcName)
             return self
         }
     }
 
     public func dynamicallyCall(withArguments matchers: [ArgMatcher]) -> FuncDSL {
-        self.argMatchers = matchers
-        return FuncDSL(mock: mock, argRecorder: self)
+        return FuncDSL(context: self, matchers: matchers)
+    }
+}
+
+struct PositionalArgChecker {
+    let context: MockFuncContext
+    let argMatchers: [ArgMatcher]
+
+    internal func checkArgs(args: [Any?]) {
+        fail(unless: args.count == self.argMatchers.count,
+             "Expected \(self.argMatchers.count) arguments, but got \(args.count)")
+        let mistmatchedArgsAndMatchers = zip(args, self.argMatchers).filter { (arg, matcher) in
+            return !matcher.matches(arg: arg)
+        }
+        fail(unless: mistmatchedArgsAndMatchers.count == 0,
+             "Arguments to \(context.funcName) didn't match: \(mistmatchedArgsAndMatchers)")
     }
 }
