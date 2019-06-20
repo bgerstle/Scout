@@ -96,9 +96,11 @@ class ScoutTests: XCTestCase {
 
     func testReturningVarForMember() {
         mockExample
-            .expect.strVar
+            .expect
+            .strVar
             .to(return: "bar")
-            .and.to(return: "baz")
+            .and
+            .to(return: "baz")
 
         XCTAssertEqual(mockExample.strVar, "bar")
         XCTAssertEqual(mockExample.strVar, "baz")
