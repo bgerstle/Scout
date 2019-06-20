@@ -10,15 +10,17 @@ import XCTest
 @testable import Scout
 
 protocol Example {
-    var foo: String { get }
+    var strVar: String { get }
 
-    func baz() -> String
+    func nullaryFunc() -> String
 
-    var bar: Int { get }
+    var varGetter: Int { get }
 
-    func biz() throws
+    func voidNullaryThrows() throws
 
-    func buz(_ value: Int)
+    func voidPositional(_ value: Int)
+
+    func voidMixedKwPosArgs(kwarg: String, _ posValue: Int)
 }
 
 struct ExampleError : Error {
@@ -28,28 +30,32 @@ struct ExampleError : Error {
 class MockExample : Example, Mockable {
     let mock = Mock()
 
-    var foo: String {
+    var strVar: String {
         get {
-            return mock.get.foo
+            return mock.get.strVar
         }
     }
 
-    var bar: Int {
+    var varGetter: Int {
         get {
-            return mock.get.bar
+            return mock.get.varGetter
         }
     }
 
-    func baz() -> String {
-        return try! mock.call.baz() as! String
+    func nullaryFunc() -> String {
+        return try! mock.call.nullaryFunc() as! String
     }
 
-    func buz(_ value: Int) {
-        try! mock.call.buz(value)
+    func voidPositional(_ value: Int) {
+        try! mock.call.voidPositional(value)
     }
 
-    func biz() throws {
-        try mock.call.biz()
+    func voidNullaryThrows() throws {
+        try mock.call.voidNullaryThrows()
+    }
+
+    func voidMixedKwPosArgs(kwarg: String, _ posValue: Int) {
+        try! mock.call.voidMixedKwPosArgs(kwarg: kwarg, posValue)
     }
 }
 
@@ -90,65 +96,71 @@ class ScoutTests: XCTestCase {
 
     func testReturningVarForMember() {
         mockExample
-            .expect.foo
+            .expect.strVar
             .to(return: "bar")
             .and.to(return: "baz")
 
-        XCTAssertEqual(mockExample.foo, "bar")
-        XCTAssertEqual(mockExample.foo, "baz")
+        XCTAssertEqual(mockExample.strVar, "bar")
+        XCTAssertEqual(mockExample.strVar, "baz")
     }
 
     func testReturningValuesFromSequence() {
         let range = Array(0..<5)
-        mockExample.expect.bar.to(returnValuesFrom: range)
+        mockExample.expect.varGetter.to(returnValuesFrom: range)
 
-        XCTAssertEqual(range.map { _ in mockExample.bar }, [0,1,2,3,4])
+        XCTAssertEqual(range.map { _ in mockExample.varGetter }, [0,1,2,3,4])
     }
 
     func testReturningValueFromFunctionCall() {
-        mockExample.expect.baz().to(return: "baz return")
-        XCTAssertEqual(mockExample.baz(), "baz return")
+        mockExample.expect.nullaryFunc().to(return: "baz return")
+        XCTAssertEqual(mockExample.nullaryFunc(), "baz return")
     }
 
     func testWrongNumberOfArgs() {
-        mockExample.expect.baz(any()).to(return: "baz return")
+        mockExample.expect.nullaryFunc(any()).to(return: "baz return")
 
-        captureTestFailure(mockExample.baz()) { failureDescription in
+        captureTestFailure(mockExample.nullaryFunc()) { failureDescription in
             XCTAssert(failureDescription.contains("Expected 1 arguments, but got 0"))
         }
     }
 
     func testArgMatchFailure() {
-        mockExample.expect.buz(equalTo(0)).toBeCalled()
+        mockExample.expect.voidPositional(equalTo(0)).toBeCalled()
 
-        captureTestFailure(mockExample.buz(1)) { failureDescription in
-            XCTAssert(failureDescription.contains("Arguments to buz didn't match"))
+        captureTestFailure(mockExample.voidPositional(1)) { failureDescription in
+            XCTAssert(failureDescription.contains("Arguments to voidPositional didn't match"))
         }
     }
 
     func testPredicateMatcher() {
-        mockExample.expect.buz(satisfies { arg in
+        mockExample.expect.voidPositional(satisfies { arg in
             guard let i = arg as? Int else {
                 return false
             }
             return i % 2 == 0
         }).toBeCalled(times: 2)
 
-        mockExample.buz(2)
+        mockExample.voidPositional(2)
 
-        captureTestFailure(mockExample.buz(1)) { failureDesription in
-            XCTAssert(failureDesription.contains("Arguments to buz didn't match"))
+        captureTestFailure(mockExample.voidPositional(1)) { failureDesription in
+            XCTAssert(failureDesription.contains("Arguments to voidPositional didn't match"))
             XCTAssert(failureDesription.contains("Matching predicate"))
         }
     }
 
     func testFuncThrows() {
-        mockExample.expect.biz().toCall { _ in
+        mockExample.expect.voidNullaryThrows().toCall { _ in
             throw ExampleError()
         }
 
-        XCTAssertThrowsError(try mockExample.biz(), "Throws example error") { error in
+        XCTAssertThrowsError(try mockExample.voidNullaryThrows(), "Throws example error") { error in
             XCTAssertTrue(error is ExampleError)
         }
+    }
+
+    func testKeywordFunc() {
+        mockExample.expect.voidMixedKwPosArgs(kwarg: equalTo("foo"), equalTo(1)).toBeCalled()
+
+        mockExample.voidMixedKwPosArgs(kwarg: "foo", 1)
     }
 }

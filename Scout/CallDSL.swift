@@ -13,24 +13,23 @@ import Foundation
 public struct CallDSL {
     let mock: Mock
 
-    @dynamicCallable
-    public struct MockCall {
-        let mock: Mock
-        let member: String
-
-        // TODO: Make this generic once the Swift compiler stops segfaulting.
-        public func dynamicallyCall(withArguments args: [Any?]) throws -> Any! {
-            let expectationValue = mock.next(expectationFor: member)
-            guard let action = expectationValue as? ([Any?]) throws -> Any? else {
-                fatalError("Failed to cast action of function expectation for \(member)")
-            }
-            return try action(args)
+    public subscript(dynamicMember member: String) -> MockKeywordCall {
+        get {
+            return MockKeywordCall(mock: mock, member: member)
         }
     }
+}
 
-    public subscript(dynamicMember member: String) -> MockCall {
-        get {
-            return MockCall(mock: mock, member: member)
+@dynamicCallable
+public struct MockKeywordCall {
+    let mock: Mock
+    let member: String
+    
+    public func dynamicallyCall(withKeywordArguments args: KeyValuePairs<String, Any?>) throws -> Any! {
+        let expectationValue = mock.next(expectationFor: member)
+        guard let action = expectationValue as? (KeyValuePairs<String, Any?>) throws -> Any? else {
+            fatalError("Failed to cast action of function expectation for \(member)")
         }
+        return try action(args)
     }
 }
