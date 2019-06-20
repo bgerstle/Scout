@@ -142,9 +142,9 @@ class ScoutTests: XCTestCase {
 
         mockExample.voidPositional(2)
 
-        captureTestFailure(mockExample.voidPositional(1)) { failureDesription in
-            XCTAssert(failureDesription.contains("Arguments to voidPositional didn't match"))
-            XCTAssert(failureDesription.contains("Matching predicate"))
+        captureTestFailure(mockExample.voidPositional(1)) { failureDescription in
+            XCTAssert(failureDescription.contains("Arguments to voidPositional didn't match"))
+            XCTAssert(failureDescription.contains("Matching predicate"))
         }
     }
 
@@ -162,5 +162,13 @@ class ScoutTests: XCTestCase {
         mockExample.expect.voidMixedKwPosArgs(kwarg: equalTo("foo"), equalTo(1)).toBeCalled()
 
         mockExample.voidMixedKwPosArgs(kwarg: "foo", 1)
+    }
+
+    func testKeywordFuncFailure() {
+        mockExample.expect.voidMixedKwPosArgs(kwarg: equalTo("bar"), equalTo(1)).toBeCalled()
+
+        captureTestFailure(mockExample.voidMixedKwPosArgs(kwarg: "foo", 1)) { failureDescription in
+            XCTAssert(failureDescription.contains("Arguments to voidMixedKwPosArgs didn't match"))
+        }
     }
 }
