@@ -11,6 +11,7 @@
 		BC2FBC5822AE9A0000D9EDDD /* ScoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2FBC5722AE9A0000D9EDDD /* ScoutTests.swift */; };
 		BC2FBC5A22AE9A0000D9EDDD /* Scout.h in Headers */ = {isa = PBXBuildFile; fileRef = BC2FBC4C22AE9A0000D9EDDD /* Scout.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BC2FBC6522AE9E9300D9EDDD /* Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2FBC6422AE9E9300D9EDDD /* Mock.swift */; };
+		BC67AA5222BC67BD0087DA2F /* Expectation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC67AA5122BC67BD0087DA2F /* Expectation.swift */; };
 		BC74E05A22B127170054AB2E /* VarDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC74E05922B127170054AB2E /* VarDSL.swift */; };
 		BC74E05C22B1272C0054AB2E /* CallDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC74E05B22B1272C0054AB2E /* CallDSL.swift */; };
 		BC74E05E22B1274D0054AB2E /* ExpectDSL.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC74E05D22B1274D0054AB2E /* ExpectDSL.swift */; };
@@ -39,6 +40,7 @@
 		BC2FBC5722AE9A0000D9EDDD /* ScoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoutTests.swift; sourceTree = "<group>"; };
 		BC2FBC5922AE9A0000D9EDDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BC2FBC6422AE9E9300D9EDDD /* Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mock.swift; sourceTree = "<group>"; };
+		BC67AA5122BC67BD0087DA2F /* Expectation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Expectation.swift; sourceTree = "<group>"; };
 		BC74E05922B127170054AB2E /* VarDSL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VarDSL.swift; sourceTree = "<group>"; };
 		BC74E05B22B1272C0054AB2E /* CallDSL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallDSL.swift; sourceTree = "<group>"; };
 		BC74E05D22B1274D0054AB2E /* ExpectDSL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpectDSL.swift; sourceTree = "<group>"; };
@@ -122,6 +124,7 @@
 		BC67AA5022BC66D10087DA2F /* Expect */ = {
 			isa = PBXGroup;
 			children = (
+				BC67AA5122BC67BD0087DA2F /* Expectation.swift */,
 				BC74E05D22B1274D0054AB2E /* ExpectDSL.swift */,
 				BC74E06822B3C37C0054AB2E /* ArgMatcher.swift */,
 				BC74E06622B311080054AB2E /* ExpectFuncDSL.swift */,
@@ -248,6 +251,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BC2FBC6522AE9E9300D9EDDD /* Mock.swift in Sources */,
+				BC67AA5222BC67BD0087DA2F /* Expectation.swift in Sources */,
 				BC74E06922B3C37C0054AB2E /* ArgMatcher.swift in Sources */,
 				BC74E06022B1794E0054AB2E /* MockFailure.swift in Sources */,
 				BC74E06722B311080054AB2E /* ExpectFuncDSL.swift in Sources */,

@@ -19,10 +19,13 @@ public class Mock {
 
     internal func next(expectationFor member: String) -> Any? {
         guard let expectations = memberExpectations[member] else {
-            recordFailure("No actions defined for member \(member)")
+            recordFailure("No expectations defined for \(member)")
             return nil
         }
-        fail(unless: expectations.count > 0, "No more expectations defined for \(member)")
+        guard expectations.count > 0 else {
+            recordFailure("No more expectations defined for \(member)")
+            return nil
+        }
         let expectation = expectations[0]
         let value = expectation.nextValue()
         // remove expectation if all its values have been consumed

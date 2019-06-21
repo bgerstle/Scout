@@ -32,22 +32,6 @@ public class ExpectFuncDSL : MockFuncContext {
     }
 }
 
-class FuncExpectation: Expectation {
-    let action: (KeyValuePairs<String, Any?>) throws -> Any?
-
-    init(action: @escaping (KeyValuePairs<String, Any?>) throws -> Any?) {
-        self.action = action
-    }
-
-    func hasNext() -> Bool {
-        return false
-    }
-
-    func nextValue() -> Any? {
-        return action
-    }
-}
-
 public struct FuncDSL {
     let context: MockFuncContext
     let argChecker: ArgChecker
@@ -68,18 +52,31 @@ public struct FuncDSL {
         }
     }
 
-    @discardableResult
-    public func toBeCalled(times: Int = 1) -> FuncDSL {
+    public func toAlways(return value: Any?) {
+        toAlwaysCall { args in
+            value
+        }
+    }
+
+    public func toBeCalled(times: Int = 1) {
         (0..<times).forEach { _ in to { } }
-        return self
     }
 
     @discardableResult
     public func toCall(_ block: @escaping (KeyValuePairs<String, Any?>) throws -> Any?) -> FuncDSL {
-        context.mock.append(expectation: FuncExpectation { args in
-            self.argChecker.checkArgs(args: args)
-            return try block(args)
-        }, for: context.funcName)
+        context.mock.append(expectation: ConsumableExpectation(value: { self.argChecker.wrap(block) }),
+                            for: context.funcName)
+        return self
+    }
+
+    @discardableResult
+    public func toAlwaysCall(_ block: @escaping (KeyValuePairs<String, Any?>) throws -> Any?) -> FuncDSL {
+        context.mock.append(expectation: PersistentExpectation(value: { self.argChecker.wrap(block) }),
+                            for: context.funcName)
+        return self
+    }
+
+    var and: FuncDSL {
         return self
     }
 }
@@ -97,6 +94,13 @@ extension KeyValuePairs {
 struct ArgChecker {
     let context: MockFuncContext
     let argMatchers: [KeyValuePair<String, ArgMatcher>]
+
+    func wrap(_ block: @escaping (KeyValuePairs<String, Any?>) throws -> Any?) -> (KeyValuePairs<String, Any?>) throws -> Any? {
+        return { args in
+            self.checkArgs(args: args)
+            return try block(args)
+        }
+    }
 
     internal func checkArgs(args: KeyValuePairs<String, Any?>) {
         fail(unless: args.count == self.argMatchers.count,

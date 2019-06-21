@@ -94,6 +94,27 @@ class ScoutTests: XCTestCase {
         let _ = expression()
     }
 
+    func testNoExpectationsDefined() {
+        // calling mock.get.strVar since calling mockExample.strVar will crash due to
+        // force-unwrapping nil in MockExample.strVar
+        captureTestFailure(mockExample.mock.get.strVar as Any?) { failureDescription in
+            XCTAssert(failureDescription.contains("No expectations defined for strVar"))
+        }
+    }
+
+    func testReturningVarForMemberOnce() {
+        mockExample
+            .expect
+            .strVar
+            .to(return: "bar")
+
+        XCTAssertEqual(mockExample.strVar, "bar")
+
+        captureTestFailure(mockExample.mock.get.strVar as Any?) { failureDescription in
+            XCTAssert(failureDescription.contains("No more expectations defined for strVar"))
+        }
+    }
+
     func testReturningVarForMember() {
         mockExample
             .expect
@@ -114,8 +135,14 @@ class ScoutTests: XCTestCase {
     }
 
     func testReturningValueFromFunctionCall() {
-        mockExample.expect.nullaryFunc().to(return: "baz return")
+        mockExample
+            .expect
+            .nullaryFunc()
+            .to(return: "baz return")
+            .and
+            .to(return: "buz")
         XCTAssertEqual(mockExample.nullaryFunc(), "baz return")
+        XCTAssertEqual(mockExample.nullaryFunc(), "buz")
     }
 
     func testWrongNumberOfArgs() {
@@ -172,5 +199,12 @@ class ScoutTests: XCTestCase {
         captureTestFailure(mockExample.voidMixedKwPosArgs(kwarg: "foo", 1)) { failureDescription in
             XCTAssert(failureDescription.contains("Arguments to voidMixedKwPosArgs didn't match"))
         }
+    }
+
+    func testFuncAlwaysReturns() {
+        mockExample.expect.nullaryFunc().toAlways(return: "bar")
+
+        XCTAssertEqual(mockExample.nullaryFunc(), "bar")
+        XCTAssertEqual(mockExample.nullaryFunc(), "bar")
     }
 }

@@ -14,64 +14,30 @@ public struct ExpectVarDSL {
 
     @discardableResult
     public func to(return value: Any?) -> ExpectVarDSL {
-        mock.append(expectation: SingleValueExpectation(value: value), for: member)
+        mock.append(expectation: ConsumableExpectation(value: { value }), for: member)
         return self
     }
 
     @discardableResult
     public func to(alwaysReturn value: Any?) -> ExpectVarDSL {
-        mock.append(expectation: PersistentVarValue(value: value), for: member)
+        mock.append(expectation: PersistentExpectation(value: { value }), for: member)
         return self
     }
 
     @discardableResult
     public func to(get getter: @autoclosure @escaping () -> Any?) -> ExpectVarDSL {
-        mock.append(expectation: GetterExpectation(getter: getter), for: member)
+        mock.append(expectation: ConsumableExpectation(value: getter), for: member)
         return self
     }
 
     @discardableResult
     public func to<S: Sequence>(returnValuesFrom values: S) -> ExpectVarDSL where S.Element: Any {
-        mock.append(expectation: MultiValueExpectation(values: Array(values)), for: member)
+        values.forEach { to(return: $0) }
         return self
     }
 
     public var and:  ExpectVarDSL {
         return self
-    }
-}
-
-class SingleValueExpectation : Expectation {
-    private var consumed: Bool = false
-    let value: Any?
-
-    init(value: Any?) {
-        self.value = value
-    }
-
-    func hasNext() -> Bool {
-        return !consumed
-    }
-
-    func nextValue() -> Any? {
-        consumed = true
-        return value
-    }
-}
-
-class MultiValueExpectation : Expectation {
-    var values: [Any] = []
-
-    init(values: [Any]) {
-        self.values = values
-    }
-
-    func hasNext() -> Bool {
-        return values.count > 0
-    }
-
-    func nextValue() -> Any? {
-        return values.removeFirst()
     }
 }
 
