@@ -92,14 +92,8 @@
 			isa = PBXGroup;
 			children = (
 				BC2FBC4C22AE9A0000D9EDDD /* Scout.h */,
-				BC2FBC6422AE9E9300D9EDDD /* Mock.swift */,
-				BC74E05F22B1794E0054AB2E /* MockFailure.swift */,
-				BC74E05D22B1274D0054AB2E /* ExpectDSL.swift */,
-				BC74E06622B311080054AB2E /* ExpectFuncDSL.swift */,
-				BC74E06822B3C37C0054AB2E /* ArgMatcher.swift */,
-				BC74E06422B310E90054AB2E /* ExpectVarDSL.swift */,
-				BC74E05B22B1272C0054AB2E /* CallDSL.swift */,
-				BC74E05922B127170054AB2E /* VarDSL.swift */,
+				BC67AA4F22BC66C80087DA2F /* Mock */,
+				BC67AA5022BC66D10087DA2F /* Expect */,
 				BC2FBC4D22AE9A0000D9EDDD /* Info.plist */,
 			);
 			path = Scout;
@@ -112,6 +106,28 @@
 				BC2FBC5922AE9A0000D9EDDD /* Info.plist */,
 			);
 			path = ScoutTests;
+			sourceTree = "<group>";
+		};
+		BC67AA4F22BC66C80087DA2F /* Mock */ = {
+			isa = PBXGroup;
+			children = (
+				BC2FBC6422AE9E9300D9EDDD /* Mock.swift */,
+				BC74E05B22B1272C0054AB2E /* CallDSL.swift */,
+				BC74E05922B127170054AB2E /* VarDSL.swift */,
+				BC74E05F22B1794E0054AB2E /* MockFailure.swift */,
+			);
+			path = Mock;
+			sourceTree = "<group>";
+		};
+		BC67AA5022BC66D10087DA2F /* Expect */ = {
+			isa = PBXGroup;
+			children = (
+				BC74E05D22B1274D0054AB2E /* ExpectDSL.swift */,
+				BC74E06822B3C37C0054AB2E /* ArgMatcher.swift */,
+				BC74E06622B311080054AB2E /* ExpectFuncDSL.swift */,
+				BC74E06422B310E90054AB2E /* ExpectVarDSL.swift */,
+			);
+			path = Expect;
 			sourceTree = "<group>";
 		};
 		BC74E06122B179600054AB2E /* Frameworks */ = {
