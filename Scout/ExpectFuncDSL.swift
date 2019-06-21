@@ -53,6 +53,10 @@ public struct FuncDSL {
     let argChecker: ArgChecker
 
     init(context: MockFuncContext, matchers: KeyValuePairs<String, ArgMatcher>) {
+        self.init(context: context, matchers: matchers.keyValuePairArray)
+    }
+
+    init(context: MockFuncContext, matchers: [KeyValuePair<String, ArgMatcher>]) {
         self.context = context
         self.argChecker = ArgChecker(context: context, argMatchers: matchers)
     }
@@ -80,9 +84,19 @@ public struct FuncDSL {
     }
 }
 
+// Using plain array of tuples instead of KeyValuePairs because the latter
+// can't be instantiated directly or manipulated.
+typealias KeyValuePair<K, V> = (key: K, value: V)
+
+extension KeyValuePairs {
+    var keyValuePairArray: [KeyValuePair<Key, Value>] {
+        return map { $0 }
+    }
+}
+
 struct ArgChecker {
     let context: MockFuncContext
-    let argMatchers: KeyValuePairs<String, ArgMatcher>
+    let argMatchers: [KeyValuePair<String, ArgMatcher>]
 
     internal func checkArgs(args: KeyValuePairs<String, Any?>) {
         fail(unless: args.count == self.argMatchers.count,
