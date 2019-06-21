@@ -8,6 +8,12 @@
 
 import Foundation
 
+// Interface for all expectations of a mock.
+protocol Expectation: class {
+    func hasNext() -> Bool
+    func nextValue() -> Any?
+}
+
 // DSL for setting expectations on a mock, either as member vars or function calls.
 @dynamicMemberLookup
 public struct ExpectDSL {
