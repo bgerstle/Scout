@@ -24,7 +24,8 @@ public struct CallDSL {
 public struct MockKeywordCall {
     let mock: Mock
     let member: String
-    
+
+    @discardableResult
     public func dynamicallyCall(withKeywordArguments args: KeyValuePairs<String, Any?>) throws -> Any! {
         let expectationValue = mock.next(expectationFor: member)
         guard let action = expectationValue as? (KeyValuePairs<String, Any?>) throws -> Any? else {
