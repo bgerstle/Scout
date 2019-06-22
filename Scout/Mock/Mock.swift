@@ -8,13 +8,23 @@
 
 import Foundation
 
+typealias SourceLocation = (file: String, line: UInt)
+
 public class Mock {
     public init() { }
 
-    private var memberExpectations: [String: [Expectation]] = [:]
+    typealias ExpectationWithLocation = (SourceLocation, Expectation)
+    private var memberExpectations: [String: [ExpectationWithLocation]] = [:]
 
-    internal func append(expectation: Expectation, for member: String) {
-        memberExpectations[member] = memberExpectations[member, default: []] + [expectation]
+    internal func append(
+        expectation: Expectation,
+        for member: String,
+        file: String,
+        line: UInt
+    ) {
+        memberExpectations[member] =
+            memberExpectations[member, default: []]
+            + [((file: file, line: line), expectation)]
     }
 
     internal func next(expectationFor member: String) -> Any? {
@@ -26,12 +36,16 @@ public class Mock {
             recordFailure("No more expectations defined for \(member)")
             return nil
         }
-        let expectation = expectations[0]
+
+        let (_, expectation) = expectations[0]
+
         let value = expectation.nextValue()
+
         // remove expectation if all its values have been consumed
         if !expectation.hasNext() {
             memberExpectations[member]!.removeFirst()
         }
+
         return value
     }
 

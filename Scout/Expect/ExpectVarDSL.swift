@@ -13,48 +13,18 @@ public struct ExpectVarDSL {
     let member: String
 
     @discardableResult
-    public func to(return value: Any?) -> ExpectVarDSL {
-        mock.append(expectation: ConsumableExpectation(value: { value }), for: member)
+    public func to(_ expectation: Expectation, _ file: String = #file, _ line: UInt = #line) -> ExpectVarDSL {
+        mock.append(expectation: expectation, for: member, file: file, line: line)
         return self
     }
-
-    @discardableResult
-    public func to(alwaysReturn value: Any?) -> ExpectVarDSL {
-        mock.append(expectation: PersistentExpectation(value: { value }), for: member)
-        return self
-    }
-
-    @discardableResult
-    public func to(get getter: @autoclosure @escaping () -> Any?) -> ExpectVarDSL {
-        mock.append(expectation: ConsumableExpectation(value: getter), for: member)
-        return self
-    }
-
-    @discardableResult
-    public func to<S: Sequence>(returnValuesFrom values: S) -> ExpectVarDSL where S.Element: Any {
-        values.forEach { to(return: $0) }
-        return self
-    }
-
-    public var and:  ExpectVarDSL {
+    
+    public var and: ExpectVarDSL {
         return self
     }
 }
 
-class PersistentVarValue : Expectation {
-    let value: Any?
-
-    init(value: Any?) {
-        self.value = value
-    }
-
-    func hasNext() -> Bool {
-        return true
-    }
-
-    func nextValue() -> Any? {
-        return value
-    }
+public func get(_ getter: @escaping () -> Any?) -> Expectation {
+    return GetterExpectation(getter: getter)
 }
 
 class GetterExpectation : Expectation {

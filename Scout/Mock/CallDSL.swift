@@ -26,9 +26,9 @@ public struct MockKeywordCall {
     let member: String
 
     @discardableResult
-    public func dynamicallyCall(withKeywordArguments args: KeyValuePairs<String, Any?>) throws -> Any! {
+    public func dynamicallyCall(withKeywordArguments args: KeyValuePairs<String, Any?>) throws -> Any? {
         let expectationValue = mock.next(expectationFor: member)
-        guard let action = expectationValue as? (KeyValuePairs<String, Any?>) throws -> Any? else {
+        guard let action = expectationValue as? FuncExpectationBlock else {
             fatalError("Failed to cast action of function expectation for \(member)")
         }
         return try action(args)

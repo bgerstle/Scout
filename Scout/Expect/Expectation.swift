@@ -9,9 +9,13 @@
 import Foundation
 
 // Interface for all expectations of a mock.
-protocol Expectation: class {
+public protocol Expectation: class {
     func hasNext() -> Bool
     func nextValue() -> Any?
+}
+
+public func `return`(_ value: Any?) -> Expectation {
+    return ConsumableExpectation(value: { value })
 }
 
 // Expectation that's removed after it's used
@@ -31,6 +35,10 @@ class ConsumableExpectation : Expectation {
         consumed = true
         return value()
     }
+}
+
+public func `alwaysReturn`(_ value: Any?) -> Expectation {
+    return PersistentExpectation(value: { value })
 }
 
 // Expectation that's never removed

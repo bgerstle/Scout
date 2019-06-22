@@ -32,6 +32,13 @@ public class ExpectFuncDSL : MockFuncContext {
     }
 }
 
+public typealias FuncExpectationBlock = (KeyValuePairs<String, Any?>) throws -> Any?
+
+public protocol FuncExpectation {
+    func hasNext() -> Bool
+    func nextBlock() -> FuncExpectationBlock
+}
+
 public struct FuncDSL {
     let context: MockFuncContext
     let argChecker: ArgChecker
@@ -46,34 +53,29 @@ public struct FuncDSL {
     }
 
     @discardableResult
-    public func to(return value: Any?) -> FuncDSL {
-        return toCall { args in
-            value
-        }
-    }
-
-    public func toAlways(return value: Any?) {
-        toAlwaysCall { args in
-            value
-        }
-    }
-
-    public func toBeCalled(times: Int = 1) {
-        (0..<times).forEach { _ in to { } }
-    }
-
-    @discardableResult
-    public func toCall(_ block: @escaping (KeyValuePairs<String, Any?>) throws -> Any?) -> FuncDSL {
-        context.mock.append(expectation: ConsumableExpectation(value: { self.argChecker.wrap(block) }),
-                            for: context.funcName)
+    public func to(_ expectation: FuncExpectation, _ file: String = #file, _ line: UInt = #line) -> FuncDSL {
+        let wrappedExpectation = ArgCheckingFuncExpectationWrapper(
+            expectation: expectation,
+            argChecker: argChecker
+        )
+        context.mock.append(expectation: wrappedExpectation, for: context.funcName, file: file, line: line)
         return self
     }
 
     @discardableResult
-    public func toAlwaysCall(_ block: @escaping (KeyValuePairs<String, Any?>) throws -> Any?) -> FuncDSL {
-        context.mock.append(expectation: PersistentExpectation(value: { self.argChecker.wrap(block) }),
-                            for: context.funcName)
-        return self
+    public func toBeCalled(_ file: String = #file, _ line: UInt = #line) -> FuncDSL {
+        let noop: FuncExpectationBlock = { _ in nil }
+        return to(ConsumableExpectation(value: { noop }), file, line)
+    }
+
+    @discardableResult
+    public func to(_ expectation: Expectation, _ file: String = #file, _ line: UInt = #line) -> FuncDSL {
+        return to(ExpectationFuncWrapper(expectation: expectation), file, line)
+    }
+
+    @discardableResult
+    public func to(_ file: String = #file, _ line: UInt = #line, _ block: @escaping FuncExpectationBlock) -> FuncDSL {
+        return to(CallFuncExpectation(block: block), file, line)
     }
 
     var and: FuncDSL {
@@ -95,7 +97,7 @@ struct ArgChecker {
     let context: MockFuncContext
     let argMatchers: [KeyValuePair<String, ArgMatcher>]
 
-    func wrap(_ block: @escaping (KeyValuePairs<String, Any?>) throws -> Any?) -> (KeyValuePairs<String, Any?>) throws -> Any? {
+    func wrap(_ block: @escaping FuncExpectationBlock) -> FuncExpectationBlock {
         return { args in
             self.checkArgs(args: args)
             return try block(args)
@@ -112,5 +114,65 @@ struct ArgChecker {
 
         fail(unless: mistmatchedArgsAndMatchers.count == 0,
              "Arguments to \(context.funcName) didn't match: \(mistmatchedArgsAndMatchers)")
+    }
+}
+
+class CallFuncExpectation : FuncExpectation {
+    var consumed: Bool = false
+    let block: FuncExpectationBlock
+
+    init(block: @escaping FuncExpectationBlock) {
+        self.block = block
+    }
+
+    func hasNext() -> Bool {
+        return !consumed
+    }
+
+    func nextBlock() -> FuncExpectationBlock {
+        consumed = true
+        return block
+    }
+}
+
+class ExpectationFuncWrapper : FuncExpectation {
+    let expectation: Expectation
+
+    init(expectation: Expectation) {
+        self.expectation = expectation
+    }
+
+    func nextBlock() -> FuncExpectationBlock {
+        // must eagerly retrieve next value, otherwise (if it's a consumable expectation)
+        // it won't be marked as consumed & removed in the Mock logic (which checks before
+        // the returned block is invoked)
+        let result = self.expectation.nextValue()
+        return { _ in result }
+    }
+
+    func nextValue() -> Any? {
+        return nextBlock()
+    }
+
+    func hasNext() -> Bool {
+        return expectation.hasNext()
+    }
+}
+
+class ArgCheckingFuncExpectationWrapper : Expectation {
+    let expectation: FuncExpectation
+    let argChecker: ArgChecker
+
+    init(expectation: FuncExpectation, argChecker: ArgChecker) {
+        self.expectation = expectation
+        self.argChecker = argChecker
+    }
+
+    public func hasNext() -> Bool {
+        return expectation.hasNext()
+    }
+
+    public func nextValue() -> Any? {
+        return argChecker.wrap(expectation.nextBlock())
     }
 }

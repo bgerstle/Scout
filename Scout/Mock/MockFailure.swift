@@ -10,12 +10,21 @@ import Foundation
 
 import XCTest
 
-internal func recordFailure(_ message: String) {
+internal func recordFailure(
+    _ message: String,
+    _ file: String = #file,
+    _ line: UInt = #line
+) {
     XCTFail(message)
 }
 
-internal func fail(unless condition: @autoclosure () -> Bool, _ message: String) {
+internal func fail(
+    unless condition: @autoclosure () -> Bool,
+    _ message: String,
+    _ file: String = #file,
+    _ line: UInt = #line
+) {
     if !condition() {
-        recordFailure(message)
+        recordFailure(message, file, line)
     }
 }
