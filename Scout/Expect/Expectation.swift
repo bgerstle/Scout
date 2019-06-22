@@ -14,25 +14,26 @@ public protocol Expectation: class {
     func nextValue() -> Any?
 }
 
-public func `return`(_ value: Any?) -> Expectation {
-    return ConsumableExpectation(value: { value })
+public func `return`(_ value: Any?, times: UInt = 1) -> Expectation {
+    return ConsumableExpectation(value: { value }, count: times)
 }
 
 // Expectation that's removed after it's used
 class ConsumableExpectation : Expectation {
-    var consumed: Bool = false
+    var valuesRemaining: UInt
     let value: () -> Any?
 
-    init(value: @escaping () -> Any?) {
+    init(value: @escaping () -> Any?, count: UInt = 1) {
         self.value = value
+        self.valuesRemaining = count
     }
 
     func hasNext() -> Bool {
-        return !consumed
+        return valuesRemaining > 0
     }
 
     func nextValue() -> Any? {
-        consumed = true
+        valuesRemaining -= 1
         return value()
     }
 }

@@ -61,7 +61,8 @@ class MockExample : Example, Mockable {
     }
 
     func mixedKwPosArgs(kwarg: String, _ posValue: Int) -> String {
-        return try! mock.call.mixedKwPosArgs(kwarg: kwarg, posValue) as! String
+        // defaulting to empty string since we need to test that failure were recorded w/o crashing
+        return try! mock.call.mixedKwPosArgs(kwarg: kwarg, posValue) as? String ?? ""
     }
 }
 
@@ -76,6 +77,7 @@ class ScoutTests: XCTestCase {
     }
 
     override func tearDown() {
+        XCTAssert(assertTestFailureBlock == nil, "Expected test failure which did not occur")
         mockExample = nil
     }
 
@@ -114,6 +116,20 @@ class ScoutTests: XCTestCase {
             .strVar
             .to(`return`("bar"))
 
+        XCTAssertEqual(mockExample.strVar, "bar")
+
+        captureTestFailure(mockExample.mock.get.strVar as Any?) { failureDescription in
+            XCTAssert(failureDescription.contains("No more expectations defined for strVar"))
+        }
+    }
+
+    func testReturningVarForMemberTwice() {
+        mockExample
+            .expect
+            .strVar
+            .to(`return`("bar", times: 2))
+
+        XCTAssertEqual(mockExample.strVar, "bar")
         XCTAssertEqual(mockExample.strVar, "bar")
 
         captureTestFailure(mockExample.mock.get.strVar as Any?) { failureDescription in
@@ -202,6 +218,26 @@ class ScoutTests: XCTestCase {
     func testKeywordFuncReturns() {
         mockExample.expect.mixedKwPosArgs(kwarg: equalTo("foo"), equalTo(1)).to(`return`("foo"))
 
+        XCTAssertEqual(mockExample.mixedKwPosArgs(kwarg: "foo", 1), "foo")
+    }
+
+    func testKeywordFuncReturnsOnlyTwice() {
+        mockExample.expect.mixedKwPosArgs(kwarg: equalTo("foo"), equalTo(1)).to(`return`("foo", times: 2))
+
+        XCTAssertEqual(mockExample.mixedKwPosArgs(kwarg: "foo", 1), "foo")
+        XCTAssertEqual(mockExample.mixedKwPosArgs(kwarg: "foo", 1), "foo")
+
+        // only retrieve the member but don't call,
+        // since a fatalError will occur after failure is recorded
+        captureTestFailure(mockExample.mixedKwPosArgs(kwarg: "foo", 1)) { failureDescription in
+            XCTAssert(failureDescription.contains("No more expectations defined for mixedKwPosArgs"))
+        }
+    }
+
+    func testKeywordFuncAlwaysReturns() {
+        mockExample.expect.mixedKwPosArgs(kwarg: equalTo("foo"), equalTo(1)).to(alwaysReturn("foo"))
+
+        XCTAssertEqual(mockExample.mixedKwPosArgs(kwarg: "foo", 1), "foo")
         XCTAssertEqual(mockExample.mixedKwPosArgs(kwarg: "foo", 1), "foo")
     }
 //
