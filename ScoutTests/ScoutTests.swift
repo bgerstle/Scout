@@ -77,6 +77,8 @@ class MockExample : Example, Mockable {
 
 class ScoutTests: XCTestCase {
     var mockExample: MockExample!
+    // For some reason, XCTFail takes StaticString & UInt, but recordFailure takes String & Int.
+    // Probably "because Objective-C"
     var assertTestFailureBlock: ((String, String, Int) -> Void)! = nil
 
     override func setUp() {
