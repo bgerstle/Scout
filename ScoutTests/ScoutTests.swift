@@ -159,14 +159,7 @@ class ScoutTests: XCTestCase {
         XCTAssertEqual(mockExample.strVar, "bar")
         XCTAssertEqual(mockExample.strVar, "baz")
     }
-//
-//    func testReturningValuesFromSequence() {
-//        let range = Array(0..<5)
-//        mockExample.expect.varGetter.to(returnValuesFrom: range)
-//
-//        XCTAssertEqual(range.map { _ in mockExample.varGetter }, [0,1,2,3,4])
-//    }
-//
+
     func testNullaryFunc() {
         mockExample
             .expect
@@ -177,15 +170,15 @@ class ScoutTests: XCTestCase {
         XCTAssertEqual(mockExample.nullaryFunc(), "baz return")
         XCTAssertEqual(mockExample.nullaryFunc(), "buz")
     }
-//
-//    func testWrongNumberOfArgs() {
-//        mockExample.expect.nullaryFunc(any()).to(return: "baz return")
-//
-//        captureTestFailure(mockExample.nullaryFunc()) { failureDescription in
-//            XCTAssert(failureDescription.contains("Expected 1 arguments, but got 0"))
-//        }
-//    }
-//
+
+    func testWrongNumberOfArgs() {
+        mockExample.expect.nullaryFunc(any()).to(`return`("baz return"))
+
+        captureTestFailure(mockExample.nullaryFunc()) { (failureDescription, _, _) in
+            XCTAssert(failureDescription.contains("Expected 1 arguments, but got 0"))
+        }
+    }
+
     func testArgMatchFailure() {
         let (expectedLocation, _) =
             runAndGetLocation(mockExample.expect.voidPositional(equalTo(0)).toBeCalled())
@@ -198,12 +191,17 @@ class ScoutTests: XCTestCase {
     }
 
     func testPredicateMatcher() {
-        let (expectedLocation, _) = runAndGetLocation(mockExample.expect.voidPositional(satisfies { arg in
-            guard let i = arg as? Int else {
-                return false
-            }
-            return i % 2 == 0
-        }).toBeCalled(times: 2))
+        let (expectedLocation, _) =
+            runAndGetLocation(
+                mockExample
+                    .expect
+                    .voidPositional(satisfies { arg in
+                        guard let i = arg as? Int else {
+                            return false
+                        }
+                        return i % 2 == 0
+                    })
+                    .toBeCalled(times: 2))
 
         mockExample.voidPositional(2)
 
@@ -256,19 +254,20 @@ class ScoutTests: XCTestCase {
         XCTAssertEqual(mockExample.mixedKwPosArgs(kwarg: "foo", 1), "foo")
         XCTAssertEqual(mockExample.mixedKwPosArgs(kwarg: "foo", 1), "foo")
     }
-//
-//    func testKeywordFuncFailure() {
-//        mockExample.expect.voidMixedKwPosArgs(kwarg: equalTo("bar"), equalTo(1)).toBeCalled()
-//
-//        captureTestFailure(mockExample.voidMixedKwPosArgs(kwarg: "foo", 1)) { failureDescription in
-//            XCTAssert(failureDescription.contains("Arguments to voidMixedKwPosArgs didn't match"))
-//        }
-//    }
-//
-//    func testFuncAlwaysReturns() {
-//        mockExample.expect.nullaryFunc().toAlways(return: "bar")
-//
-//        XCTAssertEqual(mockExample.nullaryFunc(), "bar")
-//        XCTAssertEqual(mockExample.nullaryFunc(), "bar")
-//    }
+
+    func testKeywordFuncFailure() {
+        let (expectedLocation, _) =
+            runAndGetLocation(
+                mockExample
+                    .expect
+                    .voidMixedKwPosArgs(kwarg: equalTo("bar"), equalTo(1))
+                    .toBeCalled())
+
+        captureTestFailure(mockExample.voidMixedKwPosArgs(kwarg: "foo", 1))
+        { (failureDescription, file, line) in
+            XCTAssert(failureDescription.contains("Arguments to voidMixedKwPosArgs didn't match"))
+            XCTAssertEqual(expectedLocation.file, file)
+            XCTAssertEqual(expectedLocation.line, line)
+        }
+    }
 }
