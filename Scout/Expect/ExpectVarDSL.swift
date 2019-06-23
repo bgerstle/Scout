@@ -13,8 +13,8 @@ public struct ExpectVarDSL {
     let member: String
 
     @discardableResult
-    public func to(_ expectation: Expectation, _ file: String = #file, _ line: UInt = #line) -> ExpectVarDSL {
-        mock.append(expectation: expectation, for: member, file: file, line: line)
+    public func to(_ expectation: Expectation, _ file: StaticString = #file, _ line: UInt = #line) -> ExpectVarDSL {
+        mock.append(expectation: expectation, for: member)
         return self
     }
     

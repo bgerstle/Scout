@@ -8,23 +8,16 @@
 
 import Foundation
 
-typealias SourceLocation = (file: String, line: UInt)
+public typealias SourceLocation = (file: StaticString, line: UInt)
 
 public class Mock {
     public init() { }
 
-    typealias ExpectationWithLocation = (SourceLocation, Expectation)
-    private var memberExpectations: [String: [ExpectationWithLocation]] = [:]
+    private var memberExpectations: [String: [Expectation]] = [:]
 
-    internal func append(
-        expectation: Expectation,
-        for member: String,
-        file: String,
-        line: UInt
-    ) {
+    internal func append(expectation: Expectation, for member: String) {
         memberExpectations[member] =
-            memberExpectations[member, default: []]
-            + [((file: file, line: line), expectation)]
+            memberExpectations[member, default: []] + [expectation]
     }
 
     internal func next(expectationFor member: String) -> Any? {
@@ -37,7 +30,7 @@ public class Mock {
             return nil
         }
 
-        let (_, expectation) = expectations[0]
+        let expectation = expectations[0]
 
         let value = expectation.nextValue()
 

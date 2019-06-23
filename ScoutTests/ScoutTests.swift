@@ -29,6 +29,15 @@ struct ExampleError : Error {
 
 }
 
+func runAndGetLocation<T>(
+    _ block: @autoclosure () -> T,
+    _ file: String = #file,
+    _ line: Int = #line
+    ) -> ((file: String, line: Int), T) {
+    let result = block()
+    return ((file: file, line: line), result)
+}
+
 class MockExample : Example, Mockable {
     let mock = Mock()
 
@@ -68,7 +77,7 @@ class MockExample : Example, Mockable {
 
 class ScoutTests: XCTestCase {
     var mockExample: MockExample!
-    var assertTestFailureBlock: ((String) -> Void)! = nil
+    var assertTestFailureBlock: ((String, String, Int) -> Void)! = nil
 
     override func setUp() {
         mockExample = MockExample()
@@ -87,7 +96,7 @@ class ScoutTests: XCTestCase {
                                 expected: Bool) {
         if let block = assertTestFailureBlock {
             assertTestFailureBlock = nil
-            block(description)
+            block(description, filePath, lineNumber)
         } else {
             super.recordFailure(withDescription: description,
                                 inFile: filePath,
@@ -97,7 +106,7 @@ class ScoutTests: XCTestCase {
     }
 
     func captureTestFailure<T>(_ expression: @autoclosure () -> T,
-                            _ assertion: @escaping (String) -> Void) {
+                            _ assertion: @escaping (String, String, Int) -> Void) {
         assertTestFailureBlock = assertion
         let _ = expression()
     }
@@ -105,7 +114,7 @@ class ScoutTests: XCTestCase {
     func testNoExpectationsDefined() {
         // calling mock.get.strVar since calling mockExample.strVar will crash due to
         // force-unwrapping nil in MockExample.strVar
-        captureTestFailure(mockExample.mock.get.strVar as Any?) { failureDescription in
+        captureTestFailure(mockExample.mock.get.strVar as Any?) { (failureDescription, _, _) in
             XCTAssert(failureDescription.contains("No expectations defined for strVar"))
         }
     }
@@ -118,7 +127,7 @@ class ScoutTests: XCTestCase {
 
         XCTAssertEqual(mockExample.strVar, "bar")
 
-        captureTestFailure(mockExample.mock.get.strVar as Any?) { failureDescription in
+        captureTestFailure(mockExample.mock.get.strVar as Any?) { (failureDescription, _, _) in
             XCTAssert(failureDescription.contains("No more expectations defined for strVar"))
         }
     }
@@ -132,7 +141,7 @@ class ScoutTests: XCTestCase {
         XCTAssertEqual(mockExample.strVar, "bar")
         XCTAssertEqual(mockExample.strVar, "bar")
 
-        captureTestFailure(mockExample.mock.get.strVar as Any?) { failureDescription in
+        captureTestFailure(mockExample.mock.get.strVar as Any?) { (failureDescription, _, _) in
             XCTAssert(failureDescription.contains("No more expectations defined for strVar"))
         }
     }
@@ -175,30 +184,35 @@ class ScoutTests: XCTestCase {
 //        }
 //    }
 //
-//    func testArgMatchFailure() {
-//        mockExample.expect.voidPositional(equalTo(0)).toBeCalled()
-//
-//        captureTestFailure(mockExample.voidPositional(1)) { failureDescription in
-//            XCTAssert(failureDescription.contains("Arguments to voidPositional didn't match"))
-//        }
-//    }
-//
-//    func testPredicateMatcher() {
-//        mockExample.expect.voidPositional(satisfies { arg in
-//            guard let i = arg as? Int else {
-//                return false
-//            }
-//            return i % 2 == 0
-//        }).toBeCalled(times: 2)
-//
-//        mockExample.voidPositional(2)
-//
-//        captureTestFailure(mockExample.voidPositional(1)) { failureDescription in
-//            XCTAssert(failureDescription.contains("Arguments to voidPositional didn't match"))
-//            XCTAssert(failureDescription.contains("Matching predicate"))
-//        }
-//    }
-//
+    func testArgMatchFailure() {
+        let (expectedLocation, _) =
+            runAndGetLocation(mockExample.expect.voidPositional(equalTo(0)).toBeCalled())
+
+        captureTestFailure(mockExample.voidPositional(1)) { (failureDescription, file, line) in
+            XCTAssert(failureDescription.contains("Arguments to voidPositional didn't match"))
+            XCTAssertEqual(expectedLocation.file, file)
+            XCTAssertEqual(expectedLocation.line, line)
+        }
+    }
+
+    func testPredicateMatcher() {
+        let (expectedLocation, _) = runAndGetLocation(mockExample.expect.voidPositional(satisfies { arg in
+            guard let i = arg as? Int else {
+                return false
+            }
+            return i % 2 == 0
+        }).toBeCalled(times: 2))
+
+        mockExample.voidPositional(2)
+
+        captureTestFailure(mockExample.voidPositional(1)) { (failureDescription, file, line) in
+            XCTAssert(failureDescription.contains("Arguments to voidPositional didn't match"))
+            XCTAssert(failureDescription.contains("Matching predicate"))
+            XCTAssertEqual(expectedLocation.file, file)
+            XCTAssertEqual(expectedLocation.line, line)
+        }
+    }
+
     func testFuncThrows() {
         mockExample.expect.voidNullaryThrows().to { _ in
             throw ExampleError()
@@ -229,7 +243,7 @@ class ScoutTests: XCTestCase {
 
         // only retrieve the member but don't call,
         // since a fatalError will occur after failure is recorded
-        captureTestFailure(mockExample.mixedKwPosArgs(kwarg: "foo", 1)) { failureDescription in
+        captureTestFailure(mockExample.mixedKwPosArgs(kwarg: "foo", 1)) { (failureDescription, _, _) in
             XCTAssert(failureDescription.contains("No more expectations defined for mixedKwPosArgs"))
         }
     }

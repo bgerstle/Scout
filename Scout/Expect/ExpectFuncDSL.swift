@@ -53,28 +53,30 @@ public struct FuncDSL {
     }
 
     @discardableResult
-    public func to(_ expectation: FuncExpectation, _ file: String = #file, _ line: UInt = #line) -> FuncDSL {
+    public func to(_ expectation: FuncExpectation, _ file: StaticString = #file, _ line: UInt = #line) -> FuncDSL {
         let wrappedExpectation = ArgCheckingFuncExpectationWrapper(
             expectation: expectation,
-            argChecker: argChecker
+            argChecker: argChecker,
+            location: (file: file, line: line)
         )
-        context.mock.append(expectation: wrappedExpectation, for: context.funcName, file: file, line: line)
+        context.mock.append(expectation: wrappedExpectation, for: context.funcName)
         return self
     }
 
     @discardableResult
-    public func toBeCalled(_ file: String = #file, _ line: UInt = #line) -> FuncDSL {
+    public func toBeCalled(times: UInt = 1, _ file: StaticString = #file, _ line: UInt = #line) -> FuncDSL {
         let noop: FuncExpectationBlock = { _ in nil }
-        return to(ConsumableExpectation(value: { noop }), file, line)
+        (0..<times).forEach { _ in to(ConsumableExpectation(value: { noop }), file, line) }
+        return self
     }
 
     @discardableResult
-    public func to(_ expectation: Expectation, _ file: String = #file, _ line: UInt = #line) -> FuncDSL {
+    public func to(_ expectation: Expectation, _ file: StaticString = #file, _ line: UInt = #line) -> FuncDSL {
         return to(ExpectationFuncWrapper(expectation: expectation), file, line)
     }
 
     @discardableResult
-    public func to(_ file: String = #file, _ line: UInt = #line, _ block: @escaping FuncExpectationBlock) -> FuncDSL {
+    public func to(_ file: StaticString = #file, _ line: UInt = #line, _ block: @escaping FuncExpectationBlock) -> FuncDSL {
         return to(CallFuncExpectation(block: block), file, line)
     }
 
@@ -97,23 +99,27 @@ struct ArgChecker {
     let context: MockFuncContext
     let argMatchers: [KeyValuePair<String, ArgMatcher>]
 
-    func wrap(_ block: @escaping FuncExpectationBlock) -> FuncExpectationBlock {
+    func wrap(_ block: @escaping FuncExpectationBlock, location: SourceLocation) -> FuncExpectationBlock {
         return { args in
-            self.checkArgs(args: args)
+            self.checkArgs(args: args, location: location)
             return try block(args)
         }
     }
 
-    internal func checkArgs(args: KeyValuePairs<String, Any?>) {
+    internal func checkArgs(args: KeyValuePairs<String, Any?>, location: SourceLocation) {
         fail(unless: args.count == self.argMatchers.count,
-             "Expected \(self.argMatchers.count) arguments, but got \(args.count)")
+             "Expected \(self.argMatchers.count) arguments, but got \(args.count)",
+            file: location.file,
+            line: location.line)
 
         let mistmatchedArgsAndMatchers = zip(args, self.argMatchers).filter { (argPair, matcherPair) in
             return argPair.key == matcherPair.key && !matcherPair.value.matches(arg: argPair.value)
         }
 
         fail(unless: mistmatchedArgsAndMatchers.count == 0,
-             "Arguments to \(context.funcName) didn't match: \(mistmatchedArgsAndMatchers)")
+             "Arguments to \(context.funcName) didn't match: \(mistmatchedArgsAndMatchers)",
+            file: location.file,
+            line: location.line)
     }
 }
 
@@ -162,10 +168,12 @@ class ExpectationFuncWrapper : FuncExpectation {
 class ArgCheckingFuncExpectationWrapper : Expectation {
     let expectation: FuncExpectation
     let argChecker: ArgChecker
+    let location: SourceLocation
 
-    init(expectation: FuncExpectation, argChecker: ArgChecker) {
+    init(expectation: FuncExpectation, argChecker: ArgChecker, location: SourceLocation) {
         self.expectation = expectation
         self.argChecker = argChecker
+        self.location = location
     }
 
     public func hasNext() -> Bool {
@@ -173,6 +181,6 @@ class ArgCheckingFuncExpectationWrapper : Expectation {
     }
 
     public func nextValue() -> Any? {
-        return argChecker.wrap(expectation.nextBlock())
+        return argChecker.wrap(expectation.nextBlock(), location: location)
     }
 }

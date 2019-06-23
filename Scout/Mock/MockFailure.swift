@@ -12,19 +12,19 @@ import XCTest
 
 internal func recordFailure(
     _ message: String,
-    _ file: String = #file,
-    _ line: UInt = #line
+    file: StaticString = #file,
+    line: UInt = #line
 ) {
-    XCTFail(message)
+    XCTFail(message, file: file, line: line)
 }
 
 internal func fail(
     unless condition: @autoclosure () -> Bool,
     _ message: String,
-    _ file: String = #file,
-    _ line: UInt = #line
+    file: StaticString = #file,
+    line: UInt = #line
 ) {
     if !condition() {
-        recordFailure(message, file, line)
+        recordFailure(message, file: file, line: line)
     }
 }
