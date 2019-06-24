@@ -270,4 +270,71 @@ class ScoutTests: XCTestCase {
             XCTAssertEqual(expectedLocation.line, line)
         }
     }
+
+    func testAssertNoExpectationsDoesNotAssertWhenEmpty() {
+        mockExample.mock.assertNoExpectationsRemaining()
+    }
+
+    func testAssertRemainingExpectationsWithOneExpectation() {
+        mockExample.expect.strVar.to(`return`("foo"))
+
+        captureTestFailure(mockExample.mock.assertNoExpectationsRemaining())
+        { (failureDescription, _, _) in
+            XCTAssert(failureDescription.contains("Remaining expectations"))
+        }
+    }
+
+    func testAssertRemainingExpectationsWithRemainingValues() {
+        mockExample.expect.strVar.to(`return`("foo", times: 2))
+
+        let _ = mockExample.strVar
+
+        captureTestFailure(mockExample.mock.assertNoExpectationsRemaining())
+        { (failureDescription, _, _) in
+            XCTAssert(failureDescription.contains("Remaining expectations"))
+        }
+    }
+
+    func testAssertRemainingExpectationsIgnoresPersistentExpectations() {
+        mockExample.expect.varGetter.to(alwaysReturn("bar"))
+
+        mockExample.mock.assertNoExpectationsRemaining()
+    }
+
+    func testAssertRemainingFuncExpectationsWithOneExpectation() {
+        mockExample.expect.voidNullaryThows().toBeCalled()
+
+        captureTestFailure(mockExample.mock.assertNoExpectationsRemaining())
+        { (failureDescription, _, _) in
+            XCTAssert(failureDescription.contains("Remaining expectations"))
+        }
+    }
+
+    func testAssertRemainingFuncExpectationsWithRemainingCall() {
+        mockExample.expect.voidNullaryThrows().toBeCalled(times: 2)
+
+        try! mockExample.voidNullaryThrows()
+
+        captureTestFailure(mockExample.mock.assertNoExpectationsRemaining())
+        { (failureDescription, _, _) in
+            XCTAssert(failureDescription.contains("Remaining expectations"))
+        }
+    }
+
+    func testAssertRemainingFuncCallExpectationsWithRemainingCall() {
+        mockExample.expect.voidNullaryThrows().to { _ in
+            throw ExampleError()
+        }
+
+        captureTestFailure(mockExample.mock.assertNoExpectationsRemaining())
+        { (failureDescription, _, _) in
+            XCTAssert(failureDescription.contains("Remaining expectations"))
+        }
+    }
+
+    func testAssertRemainingFuncExpectationsIgnorePersistent() {
+        mockExample.expect.voidNullaryThrows().toAlways { _ in }
+
+        mockExample.mock.assertNoExpectationsRemaining()
+    }
 }

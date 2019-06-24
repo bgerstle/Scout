@@ -12,11 +12,22 @@ import Foundation
 public protocol Expectation: class {
     func hasNext() -> Bool
     func nextValue() -> Any?
+    func shouldVerify() -> Bool
+}
+
+extension Expectation {
+    func shouldVerify() -> Bool {
+        return true
+    }
 }
 
 public func `return`(_ value: Any?, times: UInt = 1) -> Expectation {
     return ConsumableExpectation(value: { value }, count: times)
 }
+
+// Alias for `return` if people don't want to use backticks.
+let returnValue = `return`
+
 
 // Expectation that's removed after it's used
 class ConsumableExpectation : Expectation {
@@ -25,6 +36,7 @@ class ConsumableExpectation : Expectation {
 
     init(value: @escaping () -> Any?, count: UInt = 1) {
         self.value = value
+        assert(count > 0)
         self.valuesRemaining = count
     }
 
@@ -38,7 +50,13 @@ class ConsumableExpectation : Expectation {
     }
 }
 
-public func `alwaysReturn`(_ value: Any?) -> Expectation {
+extension ConsumableExpectation : CustomStringConvertible {
+    var description: String {
+        return "Return a value \(valuesRemaining) \(valuesRemaining == 1 ? "time": "times")"
+    }
+}
+
+public func alwaysReturn(_ value: Any?) -> Expectation {
     return PersistentExpectation(value: { value })
 }
 
@@ -56,5 +74,15 @@ class PersistentExpectation : Expectation {
 
     func nextValue() -> Any? {
         return value()
+    }
+
+    func shouldVerify() -> Bool {
+        return false
+    }
+}
+
+extension PersistentExpectation : CustomStringConvertible {
+    var description: String {
+        return "Return a value indefinitely"
     }
 }

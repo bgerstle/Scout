@@ -37,6 +37,13 @@ public typealias FuncExpectationBlock = (KeyValuePairs<String, Any?>) throws -> 
 public protocol FuncExpectation {
     func hasNext() -> Bool
     func nextBlock() -> FuncExpectationBlock
+    func shouldVerify() -> Bool
+}
+
+extension FuncExpectation {
+    func shouldVerify() -> Bool {
+        return true
+    }
 }
 
 public struct FuncDSL {
@@ -78,6 +85,15 @@ public struct FuncDSL {
     @discardableResult
     public func to(_ file: StaticString = #file, _ line: UInt = #line, _ block: @escaping FuncExpectationBlock) -> FuncDSL {
         return to(CallFuncExpectation(block: block), file, line)
+    }
+
+    public func toAlways(_ file: StaticString = #file, _ line: UInt = #line, _ block: @escaping FuncExpectationBlock) {
+        to(AlwaysCallFuncExpectation(block: block), file, line)
+    }
+
+    @discardableResult
+    public func to(times: Int, _ file: StaticString = #file, _ line: UInt = #line, _ block: @escaping FuncExpectationBlock) -> FuncDSL {
+        return to(CallFuncExpectation(block: block, times: times), file, line)
     }
 
     var and: FuncDSL {
@@ -124,7 +140,26 @@ struct ArgChecker {
 }
 
 class CallFuncExpectation : FuncExpectation {
-    var consumed: Bool = false
+    var remainingCalls: Int
+    let block: FuncExpectationBlock
+
+    init(block: @escaping FuncExpectationBlock, times: Int = 1) {
+        self.block = block
+        assert(times > 0)
+        self.remainingCalls = times
+    }
+
+    func hasNext() -> Bool {
+        return remainingCalls > 0
+    }
+
+    func nextBlock() -> FuncExpectationBlock {
+        remainingCalls -= 1
+        return block
+    }
+}
+
+class AlwaysCallFuncExpectation : FuncExpectation {
     let block: FuncExpectationBlock
 
     init(block: @escaping FuncExpectationBlock) {
@@ -132,12 +167,15 @@ class CallFuncExpectation : FuncExpectation {
     }
 
     func hasNext() -> Bool {
-        return !consumed
+        return true
     }
 
     func nextBlock() -> FuncExpectationBlock {
-        consumed = true
         return block
+    }
+
+    func shouldVerify() -> Bool {
+        return false
     }
 }
 
@@ -163,6 +201,10 @@ class ExpectationFuncWrapper : FuncExpectation {
     func hasNext() -> Bool {
         return expectation.hasNext()
     }
+
+    func shouldVerify() -> Bool {
+        return expectation.shouldVerify()
+    }
 }
 
 class ArgCheckingFuncExpectationWrapper : Expectation {
@@ -182,5 +224,9 @@ class ArgCheckingFuncExpectationWrapper : Expectation {
 
     public func nextValue() -> Any? {
         return argChecker.wrap(expectation.nextBlock(), location: location)
+    }
+
+    public func shouldVerify() -> Bool {
+        return expectation.shouldVerify()
     }
 }

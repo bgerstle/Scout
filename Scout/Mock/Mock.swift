@@ -42,6 +42,17 @@ public class Mock {
         return value
     }
 
+    func assertNoExpectationsRemaining(file: StaticString = #file, line: UInt = #line) -> Void {
+        fail(
+            unless: memberExpectations.values.allSatisfy { expectations in
+                expectations.filter { $0.shouldVerify() }.count == 0
+            },
+            "Remaining expectations: \(String(reflecting: memberExpectations))",
+            file: file,
+            line: line
+        )
+    }
+
     /*
     Returns a dynamic member proxy that can be used to access var stubs. For example:
 
