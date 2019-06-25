@@ -27,7 +27,7 @@ public class ExpectFuncDSL : MockFuncContext {
         self.funcName = funcName
     }
 
-    func dynamicallyCall(withKeywordArguments argMatchers: KeyValuePairs<String, ArgMatcher>) -> FuncDSL {
+    public func dynamicallyCall(withKeywordArguments argMatchers: KeyValuePairs<String, ArgMatcher>) -> FuncDSL {
         return FuncDSL(context: self, matchers: argMatchers)
     }
 }
@@ -60,7 +60,11 @@ public struct FuncDSL {
     }
 
     @discardableResult
-    public func to(_ expectation: FuncExpectation, _ file: StaticString = #file, _ line: UInt = #line) -> FuncDSL {
+    public func to(
+        _ expectation: FuncExpectation,
+        _ file: StaticString = #file,
+        _ line: UInt = #line
+    ) -> FuncDSL {
         let wrappedExpectation = ArgCheckingFuncExpectationWrapper(
             expectation: expectation,
             argChecker: argChecker,
@@ -71,32 +75,44 @@ public struct FuncDSL {
     }
 
     @discardableResult
-    public func toBeCalled(times: UInt = 1, _ file: StaticString = #file, _ line: UInt = #line) -> FuncDSL {
+    public func toBeCalled(
+        times: UInt = 1,
+        _ file: StaticString = #file,
+        _ line: UInt = #line
+    ) -> FuncDSL {
         let noop: FuncExpectationBlock = { _ in nil }
         (0..<times).forEach { _ in to(ConsumableExpectation(value: { noop }), file, line) }
         return self
     }
 
     @discardableResult
-    public func to(_ expectation: Expectation, _ file: StaticString = #file, _ line: UInt = #line) -> FuncDSL {
+    public func to(
+        _ expectation: Expectation,
+        _ file: StaticString = #file,
+        _ line: UInt = #line
+    ) -> FuncDSL {
         return to(ExpectationFuncWrapper(expectation: expectation), file, line)
     }
 
-    @discardableResult
-    public func to(_ file: StaticString = #file, _ line: UInt = #line, _ block: @escaping FuncExpectationBlock) -> FuncDSL {
-        return to(CallFuncExpectation(block: block), file, line)
-    }
-
-    public func toAlways(_ file: StaticString = #file, _ line: UInt = #line, _ block: @escaping FuncExpectationBlock) {
+    public func toAlways(
+        _ file: StaticString = #file,
+        _ line: UInt = #line,
+        _ block: @escaping FuncExpectationBlock
+    ) {
         to(AlwaysCallFuncExpectation(block: block), file, line)
     }
 
     @discardableResult
-    public func to(times: Int, _ file: StaticString = #file, _ line: UInt = #line, _ block: @escaping FuncExpectationBlock) -> FuncDSL {
+    public func to(
+        times: Int = 1,
+        _ file: StaticString = #file,
+        _ line: UInt = #line,
+        _ block: @escaping FuncExpectationBlock
+    ) -> FuncDSL {
         return to(CallFuncExpectation(block: block, times: times), file, line)
     }
 
-    var and: FuncDSL {
+    public var and: FuncDSL {
         return self
     }
 }

@@ -18,6 +18,8 @@ protocol Example {
 
     func voidNullaryThrows() throws
 
+    func unaryThrows(arg: String) throws
+
     func voidPositional(_ value: Int)
 
     func voidMixedKwPosArgs(kwarg: String, _ posValue: Int)
@@ -72,6 +74,10 @@ class MockExample : Example, Mockable {
     func mixedKwPosArgs(kwarg: String, _ posValue: Int) -> String {
         // defaulting to empty string since we need to test that failure were recorded w/o crashing
         return try! mock.call.mixedKwPosArgs(kwarg: kwarg, posValue) as? String ?? ""
+    }
+
+    func unaryThrows(arg: String) throws {
+        try mock.call.unaryThrows(arg: arg)
     }
 }
 
@@ -334,6 +340,16 @@ class ScoutTests: XCTestCase {
 
     func testAssertRemainingFuncExpectationsIgnorePersistent() {
         mockExample.expect.voidNullaryThrows().toAlways { _ in }
+
+        mockExample.mock.assertNoExpectationsRemaining()
+    }
+
+    func testUnaryThrowsCallsBlock() {
+        mockExample.expect.unaryThrows(any()).to { args in
+            XCTAssertEqual(args.first?.value as? String, "one")
+        }
+
+        try! mockExample.unaryThrows(arg: "one")
 
         mockExample.mock.assertNoExpectationsRemaining()
     }
