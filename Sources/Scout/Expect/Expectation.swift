@@ -21,6 +21,11 @@ extension Expectation {
     }
 }
 
+public func get(times: UInt = 1,
+                _ getter: @escaping () -> Any?) -> Expectation {
+    return ConsumableExpectation(value: getter, count: times)
+}
+
 public func `return`(_ value: Any?, times: UInt = 1) -> Expectation {
     return ConsumableExpectation(value: { value }, count: times)
 }

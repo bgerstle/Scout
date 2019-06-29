@@ -50,4 +50,27 @@ class ExpectVarTests : ScoutTestCase {
         XCTAssertEqual(mockExample.strVar, "bar")
         XCTAssertEqual(mockExample.strVar, "baz")
     }
+
+    func testGettingVarForMember() {
+        mockExample
+            .expect
+            .varGetter
+            .to(get { 0 })
+
+        XCTAssertEqual(mockExample.varGetter, 0)
+    }
+
+    func testWrongReturnType() {
+        mockExample
+            .expect
+            .varGetter
+            .to(get { "wrong type" })
+
+        captureTestFailure(mockExample.varGetter) { (failureDescription, _, _) in
+            let start = failureDescription.index(failureDescription.startIndex,
+                                                 offsetBy: "failed - ".count),
+                errorMessage = failureDescription[start ..< failureDescription.endIndex]
+            XCTAssertEqual(errorMessage, "Expected value of type Int for varGetter, got String")
+        }
+    }
 }

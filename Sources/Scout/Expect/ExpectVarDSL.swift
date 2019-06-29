@@ -22,23 +22,3 @@ public struct ExpectVarDSL {
         return self
     }
 }
-
-public func get(_ getter: @escaping () -> Any?) -> Expectation {
-    return GetterExpectation(getter: getter)
-}
-
-class GetterExpectation : Expectation {
-    let getter: () -> Any?
-
-    init(getter: @escaping () -> Any?) {
-        self.getter = getter
-    }
-
-    func hasNext() -> Bool {
-        return true
-    }
-
-    func nextValue() -> Any? {
-        return getter()
-    }
-}

@@ -15,11 +15,12 @@ public struct VarDSL {
     public subscript<T>(dynamicMember member: String) -> T! {
         get {
             let value = mock.next(expectationFor: member)
-            if value == nil {
+            guard let nonNilValue: Any = value else {
                 return nil
             }
-            guard let typedValue = value as? T else {
-                recordFailure("Expected value of type \(T.self) for \(member), got \(type(of: value))")
+
+            guard let typedValue = nonNilValue as? T else {
+                recordFailure("Expected value of type \(T.self) for \(member), got \(type(of: nonNilValue))")
                 return nil
             }
             return typedValue

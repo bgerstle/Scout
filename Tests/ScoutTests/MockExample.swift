@@ -51,7 +51,8 @@ class MockExample : Example, Mockable {
 
     var varGetter: Int {
         get {
-            return mock.get.varGetter
+            // defaulting to empty string since we need to test that failure were recorded w/o crashing
+            return mock.get.varGetter ?? 0
         }
     }
 
