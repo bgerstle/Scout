@@ -12,19 +12,31 @@ public protocol ArgMatcher {
     func matches(arg: Any?) -> Bool
 }
 
+let `nil` = NilMatcher()
+
+class NilMatcher : ArgMatcher, CustomStringConvertible {
+    public func matches(arg: Any?) -> Bool {
+        return arg == nil
+    }
+
+    public var description: String {
+        return "nil"
+    }
+}
+
 public func equalTo<T: Equatable>(_ value: T?) -> ArgMatcher {
     return EqualityMatcher(value: value)
 }
 
 class EqualityMatcher<T: Equatable> : ArgMatcher, CustomStringConvertible {
-    let value: T?
+    let value: T
 
-    init(value: T?) {
+    init(value: T) {
         self.value = value
     }
 
     public func matches(arg: Any?) -> Bool {
-        return value == nil && arg == nil || (arg as? T) == value
+        return (arg as? T) == value
     }
 
     public var description: String {

@@ -25,6 +25,8 @@ protocol Example {
     func voidMixedKwPosArgs(kwarg: String, _ posValue: Int)
 
     func mixedKwPosArgs(kwarg: String, _ posValue: Int) -> String
+
+    func optionalArg(_ value: Int?)
 }
 
 struct ExampleError : Error {
@@ -79,5 +81,9 @@ class MockExample : Example, Mockable {
 
     func unaryThrows(arg: String) throws {
         try mock.call.unaryThrows(arg: arg)
+    }
+
+    func optionalArg(_ value: Int?) {
+        try! mock.call.optionalArg(value)
     }
 }

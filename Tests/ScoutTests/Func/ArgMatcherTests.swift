@@ -61,4 +61,35 @@ class ArgMatcherTests : ScoutTestCase {
         XCTAssertEqual(mockExample.mixedKwPosArgs(kwarg: "bar", -1), "foo")
         XCTAssertEqual(mockExample.mixedKwPosArgs(kwarg: "baz", 1), "foo")
     }
+
+    func testMatchesNil() {
+        mockExample
+            .expect
+            .optionalArg(`nil`)
+            .toBeCalled()
+
+        mockExample.optionalArg(nil)
+    }
+
+    func testNilMatcherFailsForNonNil() {
+        mockExample
+            .expect
+            .optionalArg(`nil`)
+            .toBeCalled()
+
+        assertFails {
+            mockExample.optionalArg(1)
+        }
+    }
+
+    func testEqualityMatcherFailsForNil() {
+        mockExample
+            .expect
+            .optionalArg(equalTo(1))
+            .toBeCalled()
+
+        assertFails {
+            mockExample.optionalArg(nil)
+        }
+    }
 }
