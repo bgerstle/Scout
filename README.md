@@ -1,9 +1,13 @@
 # Scout
 Dynamic mocking for Swift.
 
+<span>
 [![Build Status](https://travis-ci.com/bgerstle/Scout.svg?branch=master)](https://travis-ci.com/bgerstle/Scout)
+[![codecov](https://codecov.io/gh/bgerstle/Scout/branch/master/graph/badge.svg)](https://codecov.io/gh/bgerstle/Scout)
+</span>
 
-> Requires Swift 5 and above
+## Requirements
+- Swift 5 or greater
 
 ## Quick Example
 Let's create a mock for an example interface:
