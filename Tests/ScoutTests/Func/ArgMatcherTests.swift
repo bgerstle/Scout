@@ -51,4 +51,14 @@ class ArgMatcherTests : ScoutTestCase {
             XCTAssertEqual(expectedLocation.line, line)
         }
     }
+
+    func testAnyMatcher() {
+        mockExample
+            .expect
+            .mixedKwPosArgs(kwarg: any(), any())
+            .to(alwaysReturn("foo"))
+
+        XCTAssertEqual(mockExample.mixedKwPosArgs(kwarg: "bar", -1), "foo")
+        XCTAssertEqual(mockExample.mixedKwPosArgs(kwarg: "baz", 1), "foo")
+    }
 }
