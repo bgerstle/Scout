@@ -7,79 +7,8 @@
 //
 
 import XCTest
+
 @testable import Scout
-
-protocol Example {
-    var strVar: String { get }
-
-    func nullaryFunc() -> String
-
-    var varGetter: Int { get }
-
-    func voidNullaryThrows() throws
-
-    func unaryThrows(arg: String) throws
-
-    func voidPositional(_ value: Int)
-
-    func voidMixedKwPosArgs(kwarg: String, _ posValue: Int)
-
-    func mixedKwPosArgs(kwarg: String, _ posValue: Int) -> String
-}
-
-struct ExampleError : Error {
-
-}
-
-func runAndGetLocation<T>(
-    _ block: @autoclosure () -> T,
-    _ file: String = #file,
-    _ line: Int = #line
-    ) -> ((file: String, line: Int), T) {
-    let result = block()
-    return ((file: file, line: line), result)
-}
-
-class MockExample : Example, Mockable {
-    let mock = Mock()
-
-    var strVar: String {
-        get {
-            return mock.get.strVar
-        }
-    }
-
-    var varGetter: Int {
-        get {
-            return mock.get.varGetter
-        }
-    }
-
-    func nullaryFunc() -> String {
-        return try! mock.call.nullaryFunc() as! String
-    }
-
-    func voidPositional(_ value: Int) {
-        try! mock.call.voidPositional(value)
-    }
-
-    func voidNullaryThrows() throws {
-        try mock.call.voidNullaryThrows()
-    }
-
-    func voidMixedKwPosArgs(kwarg: String, _ posValue: Int) {
-        try! mock.call.voidMixedKwPosArgs(kwarg: kwarg, posValue)
-    }
-
-    func mixedKwPosArgs(kwarg: String, _ posValue: Int) -> String {
-        // defaulting to empty string since we need to test that failure were recorded w/o crashing
-        return try! mock.call.mixedKwPosArgs(kwarg: kwarg, posValue) as? String ?? ""
-    }
-
-    func unaryThrows(arg: String) throws {
-        try mock.call.unaryThrows(arg: arg)
-    }
-}
 
 class ScoutTests: XCTestCase {
     var mockExample: MockExample!
@@ -336,6 +265,17 @@ class ScoutTests: XCTestCase {
         { (failureDescription, _, _) in
             XCTAssert(failureDescription.contains("Remaining expectations"))
         }
+    }
+
+    func testAlwaysCallFunc() {
+        var x = 0
+        mockExample.expect.nullaryFunc().toAlways { _ in
+            x += 1
+            return String(x)
+        }
+
+        XCTAssertEqual("1", mockExample.nullaryFunc())
+        XCTAssertEqual("2", mockExample.nullaryFunc())
     }
 
     func testAssertRemainingFuncExpectationsIgnorePersistent() {

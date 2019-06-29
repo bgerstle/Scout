@@ -80,8 +80,8 @@ public struct FuncDSL {
         _ file: StaticString = #file,
         _ line: UInt = #line
     ) -> FuncDSL {
-        let noop: FuncExpectationBlock = { _ in nil }
-        (0..<times).forEach { _ in to(ConsumableExpectation(value: { noop }), file, line) }
+        let noop: FuncExpectationBlock = { _ in () }
+        (0..<times).forEach { _ in to(CallFuncExpectation(block: noop), file, line) }
         return self
     }
 
