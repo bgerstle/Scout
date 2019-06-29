@@ -40,7 +40,7 @@ class EqualityMatcher<T: Equatable> : ArgMatcher {
     }
 
     public var description: String {
-        return "equal to \(String(describing: value))"
+        return "argument equal to \(String(describing: value))"
     }
 }
 

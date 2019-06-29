@@ -161,22 +161,23 @@ struct ArgChecker {
             return (index: offset, arg: arg, matcher: matcher)
         }
 
-        let mismatches = enumeratedArgsAndMatchers.filter { (index, arg, matcher) in
-            return !(arg.key == matcher.key && matcher.value.matches(arg: arg.value))
+        let allMatch = enumeratedArgsAndMatchers.allSatisfy { (index, arg, matcher) in
+            return matcher.value.matches(arg: arg.value)
         }
+        guard allMatch else {
+            let header = ["Arguments to \(context.funcName) didn't match:"],
+                body = enumeratedArgsAndMatchers.map { (arg) -> String in
+                    let (index, arg, matcher) = arg,
+                        label = matcher.key.count > 1 ? matcher.key : "[\(index)]",
+                        bullet = matcher.value.matches(arg: arg.value) ? "✅" : "❌"
+                    return "  \(bullet) \(label): "
+                        + "Expected \(matcher.value.description), "
+                        + "got \(arg.value.map { String(describing: $0) } ?? "nil")"
+                }
+            recordFailure((header + body).joined(separator: "\n"),
+                          file: location.file,
+                          line: location.line)
 
-        let failureMessage = mismatches.map { (arg) -> String in
-            let (index, arg, matcher) = arg
-            let label = matcher.key.count > 1 ? matcher.key : "[\(index)]"
-            return "  - \(label): "
-                + "Expected argument \(matcher.value.description), "
-                + "got \(arg.value.map { String(describing: $0) } ?? "nil")"
-        }
-
-        guard mismatches.count == 0 else {
-            recordFailure((["Arguments to \(context.funcName) didn't match:"] + failureMessage).joined(separator: "\n"),
-                file: location.file,
-                line: location.line)
             return
         }
     }

@@ -25,7 +25,7 @@ class ArgMatcherTests : ScoutTestCase {
         assertFails(withMessage:
                         """
                         failed - Arguments to voidPositional didn't match:
-                          - [0]: Expected argument equal to 0, got 1
+                          ❌ [0]: Expected argument equal to 0, got 1
                         """,
                     inFile: expectedLocation.file,
                     atLine: expectedLocation.line) {
@@ -45,8 +45,8 @@ class ArgMatcherTests : ScoutTestCase {
         assertFails(withMessage:
                         """
                         failed - Arguments to mixedKwPosArgs didn't match:
-                          - kwarg: Expected argument equal to foo, got bar
-                          - [1]: Expected argument equal to -1, got 1
+                          ❌ kwarg: Expected argument equal to foo, got bar
+                          ❌ [1]: Expected argument equal to -1, got 1
                         """,
                     inFile: expectedLocation.file,
                     atLine: expectedLocation.line) {
@@ -59,14 +59,15 @@ class ArgMatcherTests : ScoutTestCase {
             runAndGetLocation(
                 mockExample
                     .expect
-                    .mixedKwPosArgs(kwarg: equalTo("foo"),
+                    .mixedKwPosArgs(kwarg: any(),
                                     equalTo(-1))
                     .to(`return`("bar")))
 
         assertFails(withMessage:
                         """
                         failed - Arguments to mixedKwPosArgs didn't match:
-                          - [1]: Expected argument equal to -1, got 1
+                          ✅ kwarg: Expected anything, got foo
+                          ❌ [1]: Expected argument equal to -1, got 1
                         """,
                     inFile: expectedLocation.file,
                     atLine: expectedLocation.line) {
@@ -80,13 +81,14 @@ class ArgMatcherTests : ScoutTestCase {
                 mockExample
                     .expect
                     .mixedKwPosArgs(kwarg: equalTo("foo"),
-                                    equalTo(-1))
+                                    any())
                     .to(`return`("bar")))
 
         assertFails(withMessage:
                         """
                         failed - Arguments to mixedKwPosArgs didn't match:
-                          - kwarg: Expected argument equal to foo, got bar
+                          ❌ kwarg: Expected argument equal to foo, got bar
+                          ✅ [1]: Expected anything, got -1
                         """,
                     inFile: expectedLocation.file,
                     atLine: expectedLocation.line) {
