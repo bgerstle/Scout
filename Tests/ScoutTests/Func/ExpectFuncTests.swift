@@ -32,19 +32,28 @@ class ExpectFuncTests : ScoutTestCase {
     }
 
     func testKeywordFunc() {
-        mockExample.expect.voidMixedKwPosArgs(kwarg: equalTo("foo"), equalTo(1)).toBeCalled()
+        mockExample
+            .expect
+            .voidMixedKwPosArgs(kwarg: equalTo("foo"), equalTo(1))
+            .toBeCalled()
 
         mockExample.voidMixedKwPosArgs(kwarg: "foo", 1)
     }
 
     func testKeywordFuncReturns() {
-        mockExample.expect.mixedKwPosArgs(kwarg: equalTo("foo"), equalTo(1)).to(`return`("foo"))
+        mockExample
+            .expect
+            .mixedKwPosArgs(kwarg: equalTo("foo"), equalTo(1))
+            .to(`return`("foo"))
 
         XCTAssertEqual(mockExample.mixedKwPosArgs(kwarg: "foo", 1), "foo")
     }
 
     func testKeywordFuncReturnsOnlyTwice() {
-        mockExample.expect.mixedKwPosArgs(kwarg: equalTo("foo"), equalTo(1)).to(`return`("foo", times: 2))
+        mockExample
+            .expect
+            .mixedKwPosArgs(kwarg: equalTo("foo"), equalTo(1))
+            .to(`return`("foo", times: 2))
 
         XCTAssertEqual(mockExample.mixedKwPosArgs(kwarg: "foo", 1), "foo")
         XCTAssertEqual(mockExample.mixedKwPosArgs(kwarg: "foo", 1), "foo")
@@ -57,7 +66,10 @@ class ExpectFuncTests : ScoutTestCase {
     }
 
     func testKeywordFuncAlwaysReturns() {
-        mockExample.expect.mixedKwPosArgs(kwarg: equalTo("foo"), equalTo(1)).to(alwaysReturn("foo"))
+        mockExample
+            .expect
+            .mixedKwPosArgs(kwarg: equalTo("foo"), equalTo(1))
+            .to(alwaysReturn("foo"))
 
         XCTAssertEqual(mockExample.mixedKwPosArgs(kwarg: "foo", 1), "foo")
         XCTAssertEqual(mockExample.mixedKwPosArgs(kwarg: "foo", 1), "foo")
