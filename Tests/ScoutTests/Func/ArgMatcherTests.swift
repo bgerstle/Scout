@@ -163,7 +163,11 @@ class ArgMatcherTests : ScoutTestCase {
             .optionalArg(`nil`)
             .toBeCalled()
 
-        assertFails {
+        assertFails(withMessage:
+                """
+                failed - Arguments to optionalArg didn't match:
+                  ❌ [0]: Expected nil, got 1
+                """) {
             mockExample.optionalArg(1)
         }
     }
