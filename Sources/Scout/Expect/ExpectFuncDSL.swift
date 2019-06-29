@@ -139,19 +139,46 @@ struct ArgChecker {
     }
 
     internal func checkArgs(args: KeyValuePairs<String, Any?>, location: SourceLocation) {
-        fail(unless: args.count == self.argMatchers.count,
-             "Expected \(self.argMatchers.count) arguments, but got \(args.count)",
-            file: location.file,
-            line: location.line)
-
-        let mistmatchedArgsAndMatchers = zip(args, self.argMatchers).filter { (argPair, matcherPair) in
-            return argPair.key == matcherPair.key && !matcherPair.value.matches(arg: argPair.value)
+        guard args.count == self.argMatchers.count else {
+            recordFailure("Expected \(self.argMatchers.count) arguments, but got \(args.count)",
+                file: location.file,
+                line: location.line)
+            return
         }
 
-        fail(unless: mistmatchedArgsAndMatchers.count == 0,
-             "Arguments to \(context.funcName) didn't match: \(mistmatchedArgsAndMatchers)",
-            file: location.file,
-            line: location.line)
+        let expectedKeys = self.argMatchers.map { $0.key },
+            actualKeys = args.map { $0.key }
+        guard expectedKeys == actualKeys else {
+            recordFailure("Expected call with keywords \(expectedKeys), got \(actualKeys).",
+                file: location.file,
+                line: location.line)
+            return
+        }
+
+        let enumeratedArgsAndMatchers = zip(args, self.argMatchers).enumerated().map { (arg) -> (index: Int, arg: KeyValuePair<String, Any?>, matcher: (key: String, value: ArgMatcher)) in
+
+            let (offset, (arg, matcher)) = arg
+            return (index: offset, arg: arg, matcher: matcher)
+        }
+
+        let mismatches = enumeratedArgsAndMatchers.filter { (index, arg, matcher) in
+            return !(arg.key == matcher.key && matcher.value.matches(arg: arg.value))
+        }
+
+        let failureMessage = mismatches.map { (arg) -> String in
+            let (index, arg, matcher) = arg
+            let label = matcher.key.count > 1 ? matcher.key : "[\(index)]"
+            return "  - \(label): "
+                + "Expected argument \(matcher.value.description), "
+                + "got \(arg.value.map { String(describing: $0) } ?? "nil")"
+        }
+
+        guard mismatches.count == 0 else {
+            recordFailure((["Arguments to \(context.funcName) didn't match:"] + failureMessage).joined(separator: "\n"),
+                file: location.file,
+                line: location.line)
+            return
+        }
     }
 }
 

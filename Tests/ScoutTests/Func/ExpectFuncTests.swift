@@ -103,7 +103,7 @@ class ExpectFuncTests : ScoutTestCase {
     }
 
     func testUnaryThrowsCallsBlock() {
-        mockExample.expect.unaryThrows(any()).to { args in
+        mockExample.expect.unaryThrows(arg: any()).to { args in
             XCTAssertEqual(args.first?.value as? String, "one")
         }
 

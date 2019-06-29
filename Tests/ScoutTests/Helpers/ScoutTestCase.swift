@@ -19,8 +19,7 @@ class ScoutTestCase: XCTestCase {
     var mockExample: MockExample!
     // For some reason, XCTFail takes StaticString & UInt, but recordFailure takes String & Int.
     // Probably "because Objective-C"
-    var failureAssertion: TestFailureAssertion! = nil
-
+    private var failureAssertion: TestFailureAssertion! = nil
 
     override func setUp() {
         mockExample = MockExample()
@@ -54,10 +53,26 @@ class ScoutTestCase: XCTestCase {
         }
     }
 
-    func assertFails(file: StaticString = #file,
-                     line: UInt = #line,
-                     _ expression: () -> Void) {
-        captureTestFailure(expression(), file: file, line: line) { (_, _, _) in return () }
+    func assertFails<T>(
+        withMessage expectedMessage: String? = nil,
+        inFile expectedFile: String? = nil,
+        atLine expectedLine: Int? = nil,
+        file: StaticString = #file,
+        line: UInt = #line,
+        _ expression: () -> T
+    ) {
+        failureAssertion = TestFailureAssertion(block: { (actualMessage, actualFile, actualLine) in
+            if let expectedMessage = expectedMessage {
+                XCTAssertEqual(expectedMessage, actualMessage, file: file, line: line)
+            }
+            if let expectedFile = expectedFile {
+                XCTAssertEqual(expectedFile, actualFile, file: file, line: line)
+            }
+            if let expectedLine = expectedLine {
+                XCTAssertEqual(expectedLine, actualLine, file: file, line: line)
+            }
+        }, file: file, line: line)
+        let _ = expression()
     }
 
     func captureTestFailure<T>(_ expression: @autoclosure () -> T,

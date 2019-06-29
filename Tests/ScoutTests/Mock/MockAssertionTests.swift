@@ -24,9 +24,7 @@ class MockAssertionTests : ScoutTestCase {
             .nullaryFunc()
             .to(`return`("baz return"))
 
-        assertFails {
-            mockExample.assertNoExpectationsRemaining()
-        }
+        assertFails { mockExample.assertNoExpectationsRemaining() }
     }
 
     func testDoesNotVerifyPersistentFuncs() {
@@ -56,9 +54,7 @@ class MockAssertionTests : ScoutTestCase {
 
         let _ = mockExample.strVar
 
-        assertFails {
-            mockExample.assertNoExpectationsRemaining()
-        }
+        assertFails { mockExample.assertNoExpectationsRemaining() }
     }
 
     func testAssertRemainingExpectationsIgnoresPersistentExpectations() {
@@ -70,9 +66,7 @@ class MockAssertionTests : ScoutTestCase {
     func testAssertRemainingFuncExpectationsWithOneExpectation() {
         mockExample.expect.voidNullaryThows().toBeCalled()
 
-        assertFails {
-            mockExample.assertNoExpectationsRemaining()
-        }
+        assertFails { mockExample.assertNoExpectationsRemaining() }
     }
 
     func testAssertRemainingFuncExpectationsWithRemainingCall() {
@@ -80,9 +74,7 @@ class MockAssertionTests : ScoutTestCase {
 
         try! mockExample.voidNullaryThrows()
 
-        assertFails {
-            mockExample.assertNoExpectationsRemaining()
-        }
+        assertFails { mockExample.assertNoExpectationsRemaining() }
     }
 
     func testAssertRemainingFuncCallExpectationsWithRemainingCall() {
@@ -90,9 +82,7 @@ class MockAssertionTests : ScoutTestCase {
             throw ExampleError()
         }
 
-        assertFails {
-            mockExample.assertNoExpectationsRemaining()
-        }
+        assertFails { mockExample.assertNoExpectationsRemaining() }
     }
 
     func testAssertRemainingFuncExpectationsIgnorePersistent() {

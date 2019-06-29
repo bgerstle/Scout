@@ -8,13 +8,13 @@
 
 import Foundation
 
-public protocol ArgMatcher {
+public protocol ArgMatcher : CustomStringConvertible {
     func matches(arg: Any?) -> Bool
 }
 
 let `nil` = NilMatcher()
 
-class NilMatcher : ArgMatcher, CustomStringConvertible {
+class NilMatcher : ArgMatcher {
     public func matches(arg: Any?) -> Bool {
         return arg == nil
     }
@@ -24,11 +24,11 @@ class NilMatcher : ArgMatcher, CustomStringConvertible {
     }
 }
 
-public func equalTo<T: Equatable>(_ value: T?) -> ArgMatcher {
+public func equalTo<T: Equatable>(_ value: T) -> ArgMatcher {
     return EqualityMatcher(value: value)
 }
 
-class EqualityMatcher<T: Equatable> : ArgMatcher, CustomStringConvertible {
+class EqualityMatcher<T: Equatable> : ArgMatcher {
     let value: T
 
     init(value: T) {
@@ -40,7 +40,7 @@ class EqualityMatcher<T: Equatable> : ArgMatcher, CustomStringConvertible {
     }
 
     public var description: String {
-        return "Equal to \(String(describing: value))"
+        return "equal to \(String(describing: value))"
     }
 }
 
@@ -52,24 +52,26 @@ class AnyMatcher : ArgMatcher {
     public func matches(arg: Any?) -> Bool {
         return true
     }
+
+    public var description: String {
+        return "anything"
+    }
 }
 
-public func satisfies(_ predicate: @escaping (Any?) -> Bool) -> ArgMatcher {
-    return SatisfiesMatcher(predicate: predicate)
+public func satisfying(_ description: String, _ predicate: @escaping (Any?) -> Bool) -> ArgMatcher {
+    return SatisfiesMatcher(description: description, predicate: predicate)
 }
 
-class SatisfiesMatcher : ArgMatcher, CustomStringConvertible {
+class SatisfiesMatcher : ArgMatcher {
     let predicate: (Any?) -> Bool
+    let description: String
 
-    init(predicate: @escaping (Any?) -> Bool) {
+    init(description: String, predicate: @escaping (Any?) -> Bool) {
         self.predicate = predicate
+        self.description = description
     }
 
     public func matches(arg: Any?) -> Bool {
         return predicate(arg)
-    }
-
-    public var description: String {
-        return "Matching predicate"
     }
 }

@@ -18,14 +18,98 @@ class ArgMatcherTests : ScoutTestCase {
         }
     }
 
-    func testArgMatchFailure() {
+    func testPositionalArgMatchFailure() {
         let (expectedLocation, _) =
             runAndGetLocation(mockExample.expect.voidPositional(equalTo(0)).toBeCalled())
 
-        captureTestFailure(mockExample.voidPositional(1)) { (failureDescription, file, line) in
-            XCTAssert(failureDescription.contains("Arguments to voidPositional didn't match"))
-            XCTAssertEqual(expectedLocation.file, file)
-            XCTAssertEqual(expectedLocation.line, line)
+        assertFails(withMessage:
+                        """
+                        failed - Arguments to voidPositional didn't match:
+                          - [0]: Expected argument equal to 0, got 1
+                        """,
+                    inFile: expectedLocation.file,
+                    atLine: expectedLocation.line) {
+                        mockExample.voidPositional(1)
+        }
+    }
+
+    func testMixedKwPositionalArgMatchFailure() {
+        let (expectedLocation, _) =
+            runAndGetLocation(
+                mockExample
+                    .expect
+                    .mixedKwPosArgs(kwarg: equalTo("foo"),
+                                    equalTo(-1))
+                    .to(`return`("bar")))
+
+        assertFails(withMessage:
+                        """
+                        failed - Arguments to mixedKwPosArgs didn't match:
+                          - kwarg: Expected argument equal to foo, got bar
+                          - [1]: Expected argument equal to -1, got 1
+                        """,
+                    inFile: expectedLocation.file,
+                    atLine: expectedLocation.line) {
+            mockExample.mixedKwPosArgs(kwarg: "bar", 1)
+        }
+    }
+
+    func testPartialArgMatchFailurePositional() {
+        let (expectedLocation, _) =
+            runAndGetLocation(
+                mockExample
+                    .expect
+                    .mixedKwPosArgs(kwarg: equalTo("foo"),
+                                    equalTo(-1))
+                    .to(`return`("bar")))
+
+        assertFails(withMessage:
+                        """
+                        failed - Arguments to mixedKwPosArgs didn't match:
+                          - [1]: Expected argument equal to -1, got 1
+                        """,
+                    inFile: expectedLocation.file,
+                    atLine: expectedLocation.line) {
+                        mockExample.mixedKwPosArgs(kwarg: "foo", 1)
+        }
+    }
+
+    func testPartialArgMatchFailureKeyword() {
+        let (expectedLocation, _) =
+            runAndGetLocation(
+                mockExample
+                    .expect
+                    .mixedKwPosArgs(kwarg: equalTo("foo"),
+                                    equalTo(-1))
+                    .to(`return`("bar")))
+
+        assertFails(withMessage:
+                        """
+                        failed - Arguments to mixedKwPosArgs didn't match:
+                          - kwarg: Expected argument equal to foo, got bar
+                        """,
+                    inFile: expectedLocation.file,
+                    atLine: expectedLocation.line) {
+                        mockExample.mixedKwPosArgs(kwarg: "bar", -1)
+        }
+    }
+
+    func testKeywordMatchFailure() {
+        let (expectedLocation, _) =
+            runAndGetLocation(
+                mockExample
+                    .expect
+                    .mixedKwPosArgs(wrongKeyword: equalTo("foo"),
+                                    equalTo(-1))
+                    .to(`return`("bar")))
+
+        assertFails(withMessage:
+                        """
+                        failed - Expected call with keywords ["wrongKeyword", ""], got ["kwarg", ""].
+                        """,
+                    inFile: expectedLocation.file,
+                    atLine: expectedLocation.line) {
+                        mockExample.mixedKwPosArgs(kwarg: "foo", -1)
         }
     }
 
@@ -34,7 +118,7 @@ class ArgMatcherTests : ScoutTestCase {
             runAndGetLocation(
                 mockExample
                     .expect
-                    .voidPositional(satisfies { arg in
+                    .voidPositional(satisfying("is even") { arg in
                         guard let i = arg as? Int else {
                             return false
                         }
@@ -46,7 +130,7 @@ class ArgMatcherTests : ScoutTestCase {
 
         captureTestFailure(mockExample.voidPositional(1)) { (failureDescription, file, line) in
             XCTAssert(failureDescription.contains("Arguments to voidPositional didn't match"))
-            XCTAssert(failureDescription.contains("Matching predicate"))
+            XCTAssert(failureDescription.contains("is even"))
             XCTAssertEqual(expectedLocation.file, file)
             XCTAssertEqual(expectedLocation.line, line)
         }
