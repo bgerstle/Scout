@@ -1,16 +1,15 @@
 //
-//  ScoutTests.swift
+//  MockAssertionTests.swift
 //  ScoutTests
 //
-//  Created by Brian Gerstle on 6/10/19.
-//  Copyright © 2019 Brian Gerstle. All rights reserved.
+//  Created by Brian Gerstle on 6/29/19.
 //
 
 import XCTest
 
 @testable import Scout
 
-class ScoutTests: ScoutTestCase {
+class MockAssertionTests : ScoutTestCase {
     func testNoExpectationsDefined() {
         // calling mock.get.strVar since calling mockExample.strVar will crash due to
         // force-unwrapping nil in MockExample.strVar
@@ -19,14 +18,34 @@ class ScoutTests: ScoutTestCase {
         }
     }
 
+    func testVerifiesConsumableFuncsAreCalled() {
+        mockExample
+            .expect
+            .nullaryFunc()
+            .to(`return`("baz return"))
+
+        assertFails {
+            mockExample.assertNoExpectationsRemaining()
+        }
+    }
+
+    func testDoesNotVerifyPersistentFuncs() {
+        mockExample
+            .expect
+            .nullaryFunc()
+            .to(alwaysReturn("baz return"))
+
+        mockExample.assertNoExpectationsRemaining()
+    }
+
     func testAssertNoExpectationsDoesNotAssertWhenEmpty() {
-        mockExample.mock.assertNoExpectationsRemaining()
+        mockExample.assertNoExpectationsRemaining()
     }
 
     func testAssertRemainingExpectationsWithOneExpectation() {
         mockExample.expect.strVar.to(`return`("foo"))
 
-        captureTestFailure(mockExample.mock.assertNoExpectationsRemaining())
+        captureTestFailure(mockExample.assertNoExpectationsRemaining())
         { (failureDescription, _, _) in
             XCTAssert(failureDescription.contains("Remaining expectations"))
         }
@@ -37,24 +56,22 @@ class ScoutTests: ScoutTestCase {
 
         let _ = mockExample.strVar
 
-        captureTestFailure(mockExample.mock.assertNoExpectationsRemaining())
-        { (failureDescription, _, _) in
-            XCTAssert(failureDescription.contains("Remaining expectations"))
+        assertFails {
+            mockExample.assertNoExpectationsRemaining()
         }
     }
 
     func testAssertRemainingExpectationsIgnoresPersistentExpectations() {
         mockExample.expect.varGetter.to(alwaysReturn("bar"))
 
-        mockExample.mock.assertNoExpectationsRemaining()
+        mockExample.assertNoExpectationsRemaining()
     }
 
     func testAssertRemainingFuncExpectationsWithOneExpectation() {
         mockExample.expect.voidNullaryThows().toBeCalled()
 
-        captureTestFailure(mockExample.mock.assertNoExpectationsRemaining())
-        { (failureDescription, _, _) in
-            XCTAssert(failureDescription.contains("Remaining expectations"))
+        assertFails {
+            mockExample.assertNoExpectationsRemaining()
         }
     }
 
@@ -63,9 +80,8 @@ class ScoutTests: ScoutTestCase {
 
         try! mockExample.voidNullaryThrows()
 
-        captureTestFailure(mockExample.mock.assertNoExpectationsRemaining())
-        { (failureDescription, _, _) in
-            XCTAssert(failureDescription.contains("Remaining expectations"))
+        assertFails {
+            mockExample.assertNoExpectationsRemaining()
         }
     }
 
@@ -74,15 +90,14 @@ class ScoutTests: ScoutTestCase {
             throw ExampleError()
         }
 
-        captureTestFailure(mockExample.mock.assertNoExpectationsRemaining())
-        { (failureDescription, _, _) in
-            XCTAssert(failureDescription.contains("Remaining expectations"))
+        assertFails {
+            mockExample.assertNoExpectationsRemaining()
         }
     }
 
     func testAssertRemainingFuncExpectationsIgnorePersistent() {
         mockExample.expect.voidNullaryThrows().toAlways { _ in }
 
-        mockExample.mock.assertNoExpectationsRemaining()
+        mockExample.assertNoExpectationsRemaining()
     }
 }

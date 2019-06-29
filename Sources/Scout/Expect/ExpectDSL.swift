@@ -25,14 +25,3 @@ public struct ExpectDSL {
         }
     }
 }
-
-// Sugar for any test class that has an embedded mock to add the "expect" DSL.
-public protocol Mockable {
-    var mock: Mock { get }
-}
-
-public extension Mockable {
-    var expect: ExpectDSL {
-        return ExpectDSL(mock: mock)
-    }
-}

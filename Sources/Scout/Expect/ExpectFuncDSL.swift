@@ -210,10 +210,6 @@ class ExpectationFuncWrapper : FuncExpectation {
         return { _ in result }
     }
 
-    func nextValue() -> Any? {
-        return nextBlock()
-    }
-
     func hasNext() -> Bool {
         return expectation.hasNext()
     }
