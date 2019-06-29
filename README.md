@@ -42,7 +42,7 @@ mockExample.expect.foo.to(`return`("bar"))
 
 mockExample.foo // "bar"
 
-mockExample.expect.baz().to(`return("buz"))
+mockExample.expect.baz().to(`return`("buz"))
 
 mockExample.baz() // "buz"
 ```
