@@ -1,9 +1,6 @@
 # To Do
 
 ## Future versions
-- [ ] Quick/Nimble integration
-- [ ] Swift package support
-- [ ] macOS support
 
 ## v0.1
 - [x] Stub simple var return values
@@ -15,3 +12,7 @@
 - [x] Report mock failures with file & line of call site
 - [x] Verify all expectations were called
 - [ ] More descriptive failure messages
+- [ ] Quick/Nimble integration
+- [x] Swift package support
+- [x] macOS support
+- [ ] Carthage support

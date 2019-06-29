@@ -1,6 +1,8 @@
 # Scout
 Dynamic mocking for Swift.
 
+[![Build Status](https://travis-ci.com/bgerstle/Scout.svg?branch=master)](https://travis-ci.com/bgerstle/Scout)
+
 > Requires Swift 5 and above
 
 ## Quick Example
