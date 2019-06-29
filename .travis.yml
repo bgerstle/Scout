@@ -2,5 +2,10 @@ language: swift
 os: osx
 osx_image: xcode10.2
 
+skip_install: true
+
 script:
   - swift test
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -X xcodellvm -J '^Scout$'
