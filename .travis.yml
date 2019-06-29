@@ -8,4 +8,4 @@ script:
   - swift test --enable-code-coverage
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -X xcodellvm -J '^Scout$'
+  - bash <(curl -s https://codecov.io/bash) -f .build/debug/codecov/Scout.json
