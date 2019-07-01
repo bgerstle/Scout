@@ -70,4 +70,8 @@ public class Mock {
     public var call: CallDSL {
         return CallDSL(mock: self)
     }
+
+    var expect: ExpectDSL {
+        return ExpectDSL(mock: self)
+    }
 }

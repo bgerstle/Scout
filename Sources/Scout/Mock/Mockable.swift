@@ -14,7 +14,7 @@ public protocol Mockable {
 
 public extension Mockable {
     var expect: ExpectDSL {
-        return ExpectDSL(mock: mock)
+        return mock.expect
     }
 
     func assertNoExpectationsRemaining(file: StaticString = #file,
