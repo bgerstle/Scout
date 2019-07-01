@@ -2,6 +2,8 @@
 
 ## Future versions
 - [ ] Quick/Nimble integration
+- [ ] Argument capture / convenience for invoking completion blocks
+- [ ] Documentation
 
 ## v0.1
 - [x] Stub simple var return values
@@ -15,4 +17,3 @@
 - [x] More descriptive failure messages
 - [x] Swift package support
 - [x] macOS support
-- [ ] Carthage support
