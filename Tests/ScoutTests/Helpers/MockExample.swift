@@ -29,18 +29,7 @@ protocol Example {
     func optionalArg(_ value: Int?)
 }
 
-struct ExampleError : Error {
-
-}
-
-func runAndGetLocation<T>(
-    _ block: @autoclosure () -> T,
-    _ file: String = #file,
-    _ line: Int = #line
-    ) -> ((file: String, line: Int), T) {
-    let result = block()
-    return ((file: file, line: line), result)
-}
+struct ExampleError : Error { }
 
 class MockExample : Example, Mockable {
     let mock = Mock()
@@ -53,7 +42,7 @@ class MockExample : Example, Mockable {
 
     var varGetter: Int {
         get {
-            // defaulting to empty string since we need to test that failure were recorded w/o crashing
+            // defaulting to empty string since failures need to be recorded w/o crashing
             return mock.get.varGetter ?? 0
         }
     }
@@ -75,7 +64,7 @@ class MockExample : Example, Mockable {
     }
 
     func mixedKwPosArgs(kwarg: String, _ posValue: Int) -> String {
-        // defaulting to empty string since we need to test that failure were recorded w/o crashing
+        // defaulting to empty string since failures need to be recorded w/o crashing
         return try! mock.call.mixedKwPosArgs(kwarg: kwarg, posValue) as? String ?? ""
     }
 

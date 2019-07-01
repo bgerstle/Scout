@@ -1,5 +1,6 @@
 import Foundation
 
+// If you see a "No such module 'Scout'" error, make sure you're building for iOS Simulator.
 import Scout
 
 // In this example, we'll be creating a mock for the Animal interface.

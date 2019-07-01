@@ -15,6 +15,15 @@ struct TestFailureAssertion {
     let line: UInt
 }
 
+func runAndGetLocation<T>(
+    _ block: @autoclosure () -> T,
+    _ file: String = #file,
+    _ line: Int = #line
+    ) -> ((file: String, line: Int), T) {
+    let result = block()
+    return ((file: file, line: line), result)
+}
+
 class ScoutTestCase: XCTestCase {
     var mockExample: MockExample!
     // For some reason, XCTFail takes StaticString & UInt, but recordFailure takes String & Int.
