@@ -120,12 +120,7 @@ class ArgMatcherTests : ScoutTestCase {
             runAndGetLocation(
                 mockExample
                     .expect
-                    .voidPositional(satisfying("is even") { arg in
-                        guard let i = arg as? Int else {
-                            return false
-                        }
-                        return i % 2 == 0
-                    })
+                    .voidPositional(satisfying("is even", { $0 % 2 == 0 }))
                     .toBeCalled(times: 2))
 
         mockExample.voidPositional(2)

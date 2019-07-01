@@ -58,20 +58,23 @@ class AnyMatcher : ArgMatcher {
     }
 }
 
-public func satisfying(_ description: String, _ predicate: @escaping (Any?) -> Bool) -> ArgMatcher {
-    return SatisfiesMatcher(description: description, predicate: predicate)
+public func satisfying<T>(_ description: String, _ predicate: @escaping (T) -> Bool) -> ArgMatcher {
+    return SatisfiesMatcher<T>(description: description, predicate: predicate)
 }
 
-class SatisfiesMatcher : ArgMatcher {
-    let predicate: (Any?) -> Bool
+class SatisfiesMatcher<T> : ArgMatcher {
+    let predicate: (T) -> Bool
     let description: String
 
-    init(description: String, predicate: @escaping (Any?) -> Bool) {
+    init(description: String, predicate: @escaping (T) -> Bool) {
         self.predicate = predicate
         self.description = description
     }
 
     public func matches(arg: Any?) -> Bool {
-        return predicate(arg)
+        guard let typedArg = arg as? T else {
+            return false
+        }
+        return predicate(typedArg)
     }
 }
