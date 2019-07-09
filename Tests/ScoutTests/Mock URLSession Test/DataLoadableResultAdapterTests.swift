@@ -1,5 +1,5 @@
 //
-//  MockURLSessionTests.swift
+//  DataLoadableResultAdapterTests.swift
 //  Scout
 //
 //  Created by Brian Gerstle on 6/30/19.
@@ -9,7 +9,7 @@ import XCTest
 
 import Scout
 
-class MockURLSessionTests : XCTestCase {
+class DataLoadableResultAdapterTests : XCTestCase {
     var mockResumable: MockResumable!
     var mockDataLoadable: MockDataLoadable!
     var result: Result<(Data, URLResponse), Error>!
@@ -23,10 +23,6 @@ class MockURLSessionTests : XCTestCase {
         result = nil
     }
 
-    func setResult(_ result: Result<(Data, URLResponse), Error>) {
-        self.result = result
-    }
-
     func testSuccessfulResult() {
         let url = URL(string: "http://example.com/foo")!,
             data = "foo".data(using: .utf8)!,
@@ -37,19 +33,21 @@ class MockURLSessionTests : XCTestCase {
                 headerFields: nil
             )!
 
-        mockResumable
-            .expect
-            .resume()
-            .toBeCalled()
-
         mockDataLoadable
             .expect
             .loadData(with: equalTo(url), completionHandler: any())
-            .to(completeWith: data, urlResponse: urlResponse, resumable: mockResumable)
+            .to(complete(withData: data,
+                         urlResponse: urlResponse,
+                         error: nil))
 
-        mockDataLoadable.loadData(with: url, resultHandler: self.setResult)
+        let resumable = mockDataLoadable.loadData(with: url, resultHandler: self.setResult)
 
-        mockResumable.assertNoExpectationsRemaining()
+        if let actualMockResumable = resumable as? MockResumable {
+            XCTAssert(actualMockResumable === mockResumable)
+        } else {
+            XCTFail("Returned \(resumable) instead of \(String(describing: mockResumable))")
+        }
+
         mockDataLoadable.assertNoExpectationsRemaining()
 
         XCTAssertNotNil(result)
@@ -74,19 +72,15 @@ class MockURLSessionTests : XCTestCase {
                 userInfo: nil
             )
 
-        mockResumable
-            .expect
-            .resume()
-            .toBeCalled()
-
         mockDataLoadable
             .expect
             .loadData(with: equalTo(url), completionHandler: any())
-            .to(completeWith: nil, urlResponse: nil, error: error, resumable: mockResumable)
+            .to(complete(withData: nil,
+                         urlResponse: nil,
+                         error: error))
 
-        mockDataLoadable.loadData(with: url, resultHandler: self.setResult)
+        let _ = mockDataLoadable.loadData(with: url, resultHandler: self.setResult)
 
-        mockResumable.assertNoExpectationsRemaining()
         mockDataLoadable.assertNoExpectationsRemaining()
 
         XCTAssertNotNil(result)
@@ -105,19 +99,15 @@ class MockURLSessionTests : XCTestCase {
                 headerFields: nil
             )!
 
-        mockResumable
-            .expect
-            .resume()
-            .toBeCalled()
-
         mockDataLoadable
             .expect
             .loadData(with: equalTo(url), completionHandler: any())
-            .to(completeWith: nil, urlResponse: urlResponse, error: nil, resumable: mockResumable)
+            .to(complete(withData: nil,
+                         urlResponse: urlResponse,
+                         error: nil))
 
-        mockDataLoadable.loadData(with: url, resultHandler: self.setResult)
+        let _ = mockDataLoadable.loadData(with: url, resultHandler: self.setResult)
 
-        mockResumable.assertNoExpectationsRemaining()
         mockDataLoadable.assertNoExpectationsRemaining()
 
         XCTAssertNotNil(result)
@@ -133,5 +123,29 @@ class MockURLSessionTests : XCTestCase {
                 XCTFail("Unexpected URLLoadError \(actualURLLoadError)")
             }
         }
+    }
+
+    // MARK: - Helpers
+
+    func complete(
+        withData data: Data?,
+        urlResponse: URLResponse?,
+        error: Error? = nil,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) -> FuncExpectationBlock {
+        return { args in
+            guard let completionHandler = args[1].value as? DataLoadableCompletionHandler else {
+                XCTFail("completion handler has wrong type", file: file, line: line)
+                return nil
+            }
+            completionHandler(data, urlResponse, error)
+            return self.mockResumable
+        }
+    }
+
+
+    func setResult(_ result: Result<(Data, URLResponse), Error>) {
+        self.result = result
     }
 }

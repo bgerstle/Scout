@@ -102,6 +102,32 @@ public struct FuncDSL {
         to(AlwaysCallFuncExpectation(block: block), file, line)
     }
 
+    /*
+    Set an expectation with a trailing closure that's invoked with the arguments to the function.
+
+        expect.foo.to { args in /* ... */ }
+
+    where args is a KeyValuePairs containing the arguments to foo.
+    */
+    @discardableResult
+    public func to(
+        _ block: @escaping FuncExpectationBlock,
+        times: Int = 1,
+        _ file: StaticString = #file,
+        _ line: UInt = #line
+    ) -> FuncDSL {
+        return to(CallFuncExpectation(block: block, times: times), file, line)
+    }
+
+    /*
+     Set an expectation with a higher-order function that returns a function that accepts the
+     arguments to the expected function call:
+
+        expect.foo.to(incrementBy(1))
+
+     where incrementBy(1) returns a function with a single KeyValuePairs argument which contains
+     the arguments to foo.
+     */
     @discardableResult
     public func to(
         times: Int = 1,

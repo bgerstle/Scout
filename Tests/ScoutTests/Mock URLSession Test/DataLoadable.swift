@@ -13,23 +13,27 @@ protocol Resumable {
 
 extension URLSessionDataTask : Resumable {}
 
+typealias DataLoadableCompletionHandler = (Data?, URLResponse?, Error?) -> Void
+
 protocol DataLoadable {
     func loadData(
         with: URL,
-        completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void
-        ) -> Resumable
+        completionHandler: @escaping DataLoadableCompletionHandler
+    ) -> Resumable
 }
 
 enum URLLoadError : Error {
-    case noData,
+    case
+    noData,
     unrecognizedResponse(URLResponse?),
     badResponse(HTTPURLResponse)
 }
 
 extension URLSession : DataLoadable {
-    func loadData(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> Resumable {
+    func loadData(
+        with url: URL,
+        completionHandler: @escaping DataLoadableCompletionHandler
+    ) -> Resumable {
         return dataTask(with: url, completionHandler: completionHandler)
     }
 }
-
-typealias DataLoadableCompletionHandler = (Data?, URLResponse?, Error?) -> Void

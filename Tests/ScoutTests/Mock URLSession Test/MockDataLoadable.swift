@@ -24,25 +24,3 @@ class MockDataLoadable : DataLoadable, Mockable {
         return try! mock.call.loadData(with: url, completionHandler: completionHandler) as! Resumable
     }
 }
-
-// conditional conformance of DSL when mockable subject is DataLoadable?
-extension FuncDSL {
-    @discardableResult
-    func to(
-        completeWith data: Data?,
-        urlResponse: URLResponse?,
-        error: Error? = nil,
-        resumable: Resumable,
-        file: StaticString = #file,
-        line: UInt = #line
-        ) -> FuncDSL {
-        return to { args in
-            guard let completionHandler = args[1].value as? DataLoadableCompletionHandler else {
-                XCTFail("completion handler has wrong type", file: file, line: line)
-                return nil
-            }
-            completionHandler(data, urlResponse, error)
-            return resumable
-        }
-    }
-}
