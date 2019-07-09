@@ -22,7 +22,7 @@ protocol DataLoadable {
 
     func dataTask(
         with: URL,
-        completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void
+        completionHandler: @escaping DataLoadableCompletionHandler
     ) -> DataTaskType
 }
 
