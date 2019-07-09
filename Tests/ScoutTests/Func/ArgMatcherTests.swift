@@ -133,6 +133,22 @@ class ArgMatcherTests : ScoutTestCase {
         }
     }
 
+    func testPredicateMatcherTypeMismatch() {
+        let (expectedLocation, _) =
+            runAndGetLocation(
+                mockExample
+                    .expect
+                    .voidPositional(satisfying("is foo", { $0 == "bar" }))
+                    .toBeCalled())
+
+        captureTestFailure(mockExample.voidPositional(1)) { (failureDescription, file, line) in
+            XCTAssert(failureDescription.contains("Arguments to voidPositional didn't match"))
+            XCTAssert(failureDescription.contains("is foo"))
+            XCTAssertEqual(expectedLocation.file, file)
+            XCTAssertEqual(expectedLocation.line, line)
+        }
+    }
+
     func testAnyMatcher() {
         mockExample
             .expect
