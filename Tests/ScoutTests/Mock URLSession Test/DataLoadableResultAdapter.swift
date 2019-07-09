@@ -35,9 +35,11 @@ class DataLoadableResultAdapter {
 }
 
 extension DataLoadable {
-    func loadData(with url: URL, resultHandler: @escaping DataLoadableResultAdapter.ResultHandler) -> Resumable {
+    func dataTask(
+        with url: URL,
+        resultHandler: @escaping DataLoadableResultAdapter.ResultHandler
+    ) -> DataTaskType {
         let adapter = DataLoadableResultAdapter(resultHandler: resultHandler)
-        let task: Resumable = loadData(with: url, completionHandler: adapter.complete)
-        return task
+        return dataTask(with: url, completionHandler: adapter.complete)
     }
 }

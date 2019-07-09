@@ -18,9 +18,11 @@ class MockResumable : Resumable, Mockable {
 }
 
 class MockDataLoadable : DataLoadable, Mockable {
+    typealias DataTaskType = MockResumable
+
     let mock = Mock()
 
-    func loadData(with url: URL, completionHandler: @escaping DataLoadableCompletionHandler) -> Resumable {
-        return try! mock.call.loadData(with: url, completionHandler: completionHandler) as! Resumable
+    func dataTask(with url: URL, completionHandler: @escaping DataLoadableCompletionHandler) -> MockResumable {
+        return try! mock.call.dataTask(with: url, completionHandler: completionHandler) as! MockResumable
     }
 }

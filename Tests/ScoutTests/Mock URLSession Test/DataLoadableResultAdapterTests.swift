@@ -35,18 +35,14 @@ class DataLoadableResultAdapterTests : XCTestCase {
 
         mockDataLoadable
             .expect
-            .loadData(with: equalTo(url), completionHandler: any())
+            .dataTask(with: equalTo(url), completionHandler: any())
             .to(complete(withData: data,
                          urlResponse: urlResponse,
                          error: nil))
 
-        let resumable = mockDataLoadable.loadData(with: url, resultHandler: self.setResult)
+        let resumable = mockDataLoadable.dataTask(with: url, resultHandler: self.setResult)
 
-        if let actualMockResumable = resumable as? MockResumable {
-            XCTAssert(actualMockResumable === mockResumable)
-        } else {
-            XCTFail("Returned \(resumable) instead of \(String(describing: mockResumable))")
-        }
+        XCTAssert(resumable === mockResumable)
 
         mockDataLoadable.assertNoExpectationsRemaining()
 
@@ -74,12 +70,12 @@ class DataLoadableResultAdapterTests : XCTestCase {
 
         mockDataLoadable
             .expect
-            .loadData(with: equalTo(url), completionHandler: any())
+            .dataTask(with: equalTo(url), completionHandler: any())
             .to(complete(withData: nil,
                          urlResponse: nil,
                          error: error))
 
-        let _ = mockDataLoadable.loadData(with: url, resultHandler: self.setResult)
+        let _ = mockDataLoadable.dataTask(with: url, resultHandler: self.setResult)
 
         mockDataLoadable.assertNoExpectationsRemaining()
 
@@ -101,12 +97,12 @@ class DataLoadableResultAdapterTests : XCTestCase {
 
         mockDataLoadable
             .expect
-            .loadData(with: equalTo(url), completionHandler: any())
+            .dataTask(with: equalTo(url), completionHandler: any())
             .to(complete(withData: nil,
                          urlResponse: urlResponse,
                          error: nil))
 
-        let _ = mockDataLoadable.loadData(with: url, resultHandler: self.setResult)
+        let _ = mockDataLoadable.dataTask(with: url, resultHandler: self.setResult)
 
         mockDataLoadable.assertNoExpectationsRemaining()
 

@@ -16,10 +16,11 @@ extension URLSessionDataTask : Resumable {}
 typealias DataLoadableCompletionHandler = (Data?, URLResponse?, Error?) -> Void
 
 protocol DataLoadable {
-    func loadData(
+    associatedtype DataTaskType: Resumable
+    func dataTask(
         with: URL,
-        completionHandler: @escaping DataLoadableCompletionHandler
-    ) -> Resumable
+        completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void
+    ) -> DataTaskType
 }
 
 enum URLLoadError : Error {
@@ -30,10 +31,5 @@ enum URLLoadError : Error {
 }
 
 extension URLSession : DataLoadable {
-    func loadData(
-        with url: URL,
-        completionHandler: @escaping DataLoadableCompletionHandler
-    ) -> Resumable {
-        return dataTask(with: url, completionHandler: completionHandler)
-    }
+    typealias DataTaskType = URLSessionDataTask
 }
