@@ -71,28 +71,7 @@ class MockAnimal : Animal, Mockable {
 
 let caretaker = Caretaker(name: "Brian")
 
-// Let's start by configuring our MockAnimal to pretend it's a cat:
-var mockCat = MockAnimal()
-mockCat.expect.species.to(`return`("cat"))
-mockCat.expect.speak().to(`return`("meow"))
-// Like most cats, we'll ignore the first thing we're offered, hoping for something better.
-enum AnimalFeedingErrors : Error {
-    case notInterested, barf
-}
-mockCat.expect.eat(food: any()).toAlways { args in
-    // Since we get args as untyped KeyValuePairs, we need to cast it back to the expected type.
-    let food = args.first!.value! as! String
-    if !food.contains("tuna") {
-        throw AnimalFeedingErrors.notInterested
-    }
-    return ()
-}
-
-caretaker.talk(to: mockCat)
-caretaker.feed(animal: mockCat, food: "Meow mix")
-caretaker.feed(animal: mockCat, food: "Canned tuna")
-
-// Ok, how about an obedient dog that will eat anything?
+// Let's start by configuring our MockAnimal to imitate a dog:
 let mockDog = MockAnimal()
 mockDog.expect.species.to(`return`("dog"))
 mockDog.expect.speak().to(`return`("woof!"))
@@ -100,3 +79,24 @@ mockDog.expect.eat(food: any()).toBeCalled()
 
 caretaker.talk(to: mockDog)
 caretaker.feed(animal: mockDog, food: "kibble")
+
+// Next, we'll try an animal with more distinctive tastes, a cat:
+var mockCat = MockAnimal()
+mockCat.expect.species.to(`return`("cat"))
+mockCat.expect.speak().to(`return`("meow"))
+// Like most cats, we'll ignore the first thing we're offered, hoping for something better.
+enum AnimalFeedingErrors : Error {
+    case notInterested, barf
+}
+func onlyEatTuna(_ args: KeyValuePairs<String, Any?>) throws -> Any? {
+    // Since we get args as untyped KeyValuePairs, we need to cast it back to the expected type.
+    let food = args.first!.value! as! String
+    if !food.contains("tuna") {
+        throw AnimalFeedingErrors.notInterested
+    }
+    return ()
+}
+mockCat.expect.eat(food: any()).toAlways(onlyEatTuna)
+caretaker.talk(to: mockCat)
+caretaker.feed(animal: mockCat, food: "Meow mix")
+caretaker.feed(animal: mockCat, food: "Canned tuna")

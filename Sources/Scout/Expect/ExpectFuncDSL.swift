@@ -97,8 +97,14 @@ public struct FuncDSL {
     public func toAlways(
         _ file: StaticString = #file,
         _ line: UInt = #line,
-        _ block: @escaping FuncExpectationBlock
-    ) {
+        _ block: @escaping FuncExpectationBlock) {
+        to(AlwaysCallFuncExpectation(block: block), file, line)
+    }
+
+    public func toAlways(
+        _ block: @escaping FuncExpectationBlock,
+        _ file: StaticString = #file,
+        _ line: UInt = #line) {
         to(AlwaysCallFuncExpectation(block: block), file, line)
     }
 
