@@ -2,10 +2,10 @@
 
 ## Future versions
 - [ ] Quick/Nimble integration
-- [ ] Argument capture / convenience for invoking completion blocks
 - [ ] Documentation
+- [ ] Argument capture, or API for inspecting mock calls
 
-## v0.1
+## v0.0.1
 - [x] Stub simple var return values
 - [x] Replace assertion failures with XCTest failure reports
 - [x] Support "always return"
