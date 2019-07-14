@@ -7,6 +7,8 @@
 
 import XCTest
 
+@testable import ExampleProject
+
 import Scout
 
 class DataLoadableResultAdapterTests : XCTestCase {
