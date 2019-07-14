@@ -76,3 +76,6 @@ fastlane/test_output
 # Ignore Package.resolved of ExampleProject
 # Installing different versions based on what's pushed anyway
 ExampleProject/Package.resolved
+
+# Ignore symlink created by "attaching" Scout to ExampleProject
+ExampleProject/Packages/Scout
