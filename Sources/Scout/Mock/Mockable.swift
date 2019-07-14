@@ -17,8 +17,8 @@ public extension Mockable {
         return mock.expect
     }
 
-    func assertNoExpectationsRemaining(file: StaticString = #file,
+    func verify(file: StaticString = #file,
                                        line: UInt = #line) {
-        mock.assertNoExpectationsRemaining(file: file, line: line)
+        mock.verify(file: file, line: line)
     }
 }

@@ -46,7 +46,7 @@ class DataLoadableResultAdapterTests : XCTestCase {
 
         XCTAssert(resumable === mockResumable)
 
-        mockDataLoadable.assertNoExpectationsRemaining()
+        mockDataLoadable.verify()
 
         XCTAssertNotNil(result)
 
@@ -79,7 +79,7 @@ class DataLoadableResultAdapterTests : XCTestCase {
 
         let _ = mockDataLoadable.dataTask(with: url, resultHandler: self.setResult)
 
-        mockDataLoadable.assertNoExpectationsRemaining()
+        mockDataLoadable.verify()
 
         XCTAssertNotNil(result)
 
@@ -106,7 +106,7 @@ class DataLoadableResultAdapterTests : XCTestCase {
 
         let _ = mockDataLoadable.dataTask(with: url, resultHandler: self.setResult)
 
-        mockDataLoadable.assertNoExpectationsRemaining()
+        mockDataLoadable.verify()
 
         XCTAssertNotNil(result)
 

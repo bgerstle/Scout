@@ -42,7 +42,7 @@ public class Mock {
         return value
     }
 
-    func assertNoExpectationsRemaining(file: StaticString = #file, line: UInt = #line) -> Void {
+    func verify(file: StaticString = #file, line: UInt = #line) -> Void {
         fail(
             unless: memberExpectations.values.allSatisfy { expectations in
                 expectations.filter { $0.shouldVerify() }.count == 0

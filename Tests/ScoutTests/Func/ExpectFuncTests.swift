@@ -109,6 +109,6 @@ class ExpectFuncTests : ScoutTestCase {
 
         try! mockExample.unaryThrows(arg: "one")
 
-        mockExample.mock.assertNoExpectationsRemaining()
+        mockExample.mock.verify()
     }
 }
