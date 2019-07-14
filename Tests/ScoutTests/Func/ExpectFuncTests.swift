@@ -22,9 +22,7 @@ class ExpectFuncTests : ScoutTestCase {
     }
 
     func testFuncThrows() {
-        mockExample.expect.voidNullaryThrows().to { _ in
-            throw ExampleError()
-        }
+        mockExample.expect.voidNullaryThrows().to(throwExampleError)
 
         XCTAssertThrowsError(try mockExample.voidNullaryThrows(), "Throws example error") { error in
             XCTAssertTrue(error is ExampleError)
@@ -93,19 +91,20 @@ class ExpectFuncTests : ScoutTestCase {
 
     func testAlwaysCallFunc() {
         var x = 0
-        mockExample.expect.nullaryFunc().toAlways { _ in
+        func incrementX(_ args: KeyValuePairs<String, Any?>) -> String {
             x += 1
             return String(x)
         }
+        mockExample.expect.nullaryFunc().toAlways(incrementX)
 
         XCTAssertEqual("1", mockExample.nullaryFunc())
         XCTAssertEqual("2", mockExample.nullaryFunc())
     }
 
     func testUnaryThrowsCallsBlock() {
-        mockExample.expect.unaryThrows(arg: any()).to { args in
+        mockExample.expect.unaryThrows(arg: any()).to({ args in
             XCTAssertEqual(args.first?.value as? String, "one")
-        }
+        })
 
         try! mockExample.unaryThrows(arg: "one")
 

@@ -95,13 +95,6 @@ public struct FuncDSL {
     }
 
     public func toAlways(
-        _ file: StaticString = #file,
-        _ line: UInt = #line,
-        _ block: @escaping FuncExpectationBlock) {
-        to(AlwaysCallFuncExpectation(block: block), file, line)
-    }
-
-    public func toAlways(
         _ block: @escaping FuncExpectationBlock,
         _ file: StaticString = #file,
         _ line: UInt = #line) {
@@ -109,12 +102,14 @@ public struct FuncDSL {
     }
 
     /*
-    Set an expectation with a trailing closure that's invoked with the arguments to the function.
+     Set an expectation with a higher-order function that returns a function that accepts the
+     arguments to the expected function call:
 
-        expect.foo.to { args in /* ... */ }
+     expect.foo.to(incrementBy(1))
 
-    where args is a KeyValuePairs containing the arguments to foo.
-    */
+     where incrementBy(1) returns a function with a single KeyValuePairs argument which contains
+     the arguments to foo.
+     */
     @discardableResult
     public func to(
         _ block: @escaping FuncExpectationBlock,
@@ -126,24 +121,10 @@ public struct FuncDSL {
     }
 
     /*
-     Set an expectation with a higher-order function that returns a function that accepts the
-     arguments to the expected function call:
+     Chain expectations on a function:
 
-        expect.foo.to(incrementBy(1))
-
-     where incrementBy(1) returns a function with a single KeyValuePairs argument which contains
-     the arguments to foo.
-     */
-    @discardableResult
-    public func to(
-        times: Int = 1,
-        _ file: StaticString = #file,
-        _ line: UInt = #line,
-        _ block: @escaping FuncExpectationBlock
-    ) -> FuncDSL {
-        return to(CallFuncExpectation(block: block, times: times), file, line)
-    }
-
+     expect.foo.to(`return`(1)).and.to(`return`(5))
+    */
     public var and: FuncDSL {
         return self
     }

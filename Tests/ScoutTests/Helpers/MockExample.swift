@@ -31,6 +31,10 @@ protocol Example {
 
 struct ExampleError : Error { }
 
+func throwExampleError(_ args: KeyValuePairs<String, Any?>) throws {
+    throw ExampleError()
+}
+
 class MockExample : Example, Mockable {
     let mock = Mock()
 
