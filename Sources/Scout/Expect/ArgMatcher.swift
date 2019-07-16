@@ -78,3 +78,17 @@ class SatisfiesMatcher<T> : ArgMatcher {
         return predicate(typedArg)
     }
 }
+
+public func instance<T>(of type: T.Type) -> ArgMatcher {
+    return InstanceMatcher<T>()
+}
+
+class InstanceMatcher<T> : ArgMatcher {
+    public func matches(arg: Any?) -> Bool {
+        return arg is T
+    }
+
+    public var description: String {
+        return "instance of \(T.self)"
+    }
+}

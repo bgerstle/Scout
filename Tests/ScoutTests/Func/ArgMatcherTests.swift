@@ -193,4 +193,30 @@ class ArgMatcherTests : ScoutTestCase {
             mockExample.optionalArg(nil)
         }
     }
+
+    func testInstanceOfMatcherFails() {
+        mockExample
+            .expect
+            .genericArgAndReturn(arg: instance(of: String.self))
+            .to(`return`(0))
+
+        assertFails(withMessage:
+            """
+            failed - Arguments to genericArgAndReturn didn't match:
+              ❌ arg: Expected instance of String, got 0
+            """) {
+            let _: Any = mockExample.genericArgAndReturn(arg: 0)
+        }
+    }
+
+    func testInstanceOfMatcherSucceeds() {
+        mockExample
+            .expect
+            .genericArgAndReturn(arg: instance(of: String.self))
+            .to(`return`(0))
+
+        let _: Any = mockExample.genericArgAndReturn(arg: "0")
+
+        mockExample.verify()
+    }
 }
