@@ -27,6 +27,11 @@ protocol Example {
     func mixedKwPosArgs(kwarg: String, _ posValue: Int) -> String
 
     func optionalArg(_ value: Int?)
+
+    func genericArgAndReturn<ArgType, RetType>(arg: ArgType) -> RetType
+
+    // Swift currently segfaults if we try to dynamically call a function with inout arguments.
+    // func inoutExample(_ value: inout Int?)
 }
 
 struct ExampleError : Error { }
@@ -78,5 +83,9 @@ class MockExample : Example, Mockable {
 
     func optionalArg(_ value: Int?) {
         try! mock.call.optionalArg(value)
+    }
+
+    func genericArgAndReturn<ArgType, RetType>(arg: ArgType) -> RetType {
+        return try! mock.call.genericArgAndReturn(arg: arg) as! RetType
     }
 }

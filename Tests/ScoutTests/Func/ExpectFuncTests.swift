@@ -110,4 +110,13 @@ class ExpectFuncTests : ScoutTestCase {
 
         mockExample.mock.verify()
     }
+
+    func testGenericArgAndReturn() {
+        let expectedReturn = "foo"
+        mockExample.expect.genericArgAndReturn(arg: any()).to(`return`(expectedReturn))
+
+        let actualReturn: String = mockExample.genericArgAndReturn(arg: 0)
+
+        XCTAssertEqual(actualReturn, expectedReturn)
+    }
 }
