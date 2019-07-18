@@ -18,11 +18,9 @@ protocol FoodDepot: class {
 }
 
 class Caretaker {
-    let name: String
     let feedStore: FoodDepot
 
-    init(name: String, feedStore: FoodDepot) {
-        self.name = name
+    init(feedStore: FoodDepot) {
         self.feedStore = feedStore
     }
 

@@ -19,7 +19,7 @@ class CaretakerTests: XCTestCase {
         continueAfterFailure = false
 
         mockFoodDepot = MockFoodDepot()
-        caretaker = Caretaker(name: "Brian", feedStore: mockFoodDepot)
+        caretaker = Caretaker(feedStore: mockFoodDepot)
     }
 
     func testDoesNotCompostFoodThatIsEaten() {
