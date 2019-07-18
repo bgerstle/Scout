@@ -11,74 +11,43 @@ import Scout
 
 @testable import ExampleProject
 
-class MockAnimal : Animal, Mockable {
-    // Simply declare a `mock` member and use it
-    // in all your protocol method implementations:
-    let mock = Mock()
-
-    // Here, we use the `get` DSL to retrieve a `var`:
-    var species: String {
-        get {
-            return mock.get.species
-        }
-    }
-
-    // For throwing functions, we use `try` instead of `try!`, since we only want to
-    // rethrow any exceptions that were set up in the mock.
-    func eat<T>(_ food: inout T?) {
-        food = try! mock.call.eat(food: food) as! T?
-    }
-}
-
-class MockFoodDepot: FoodDepot, Mockable {
-    let mock = Mock()
-
-    func get<T>() -> T {
-        return try! mock.call.get() as! T
-    }
-
-    func compost<T>(food: T) {
-        try! mock.call.compost(food: food)
-    }
-}
-
-// eat() Behaviors
-
-func beEaten() -> FuncExpectationBlock {
-    return { _ in
-        return nil
-    }
-}
-
-func onlyEatTuna() -> FuncExpectationBlock {
-    return { args in
-        // Since we get args as untyped KeyValuePairs, we need to cast it back to the expected type.
-        let food = args.first?.value!
-        return food is Tuna ? nil : food
-    }
-}
-
-// Dummy Food Types
-
-struct Kibble {}
-struct MeowMix {}
-struct Tuna {}
-
 class CaretakerTests: XCTestCase {
     var caretaker: Caretaker!
     var mockFoodDepot: MockFoodDepot!
-    var mockAnimal: MockAnimal!
 
     override func setUp() {
+        continueAfterFailure = false
+
         mockFoodDepot = MockFoodDepot()
-        mockAnimal = MockAnimal()
         caretaker = Caretaker(name: "Brian", feedStore: mockFoodDepot)
     }
 
-    func testGetsKibbleFromDepotToFeedDog() {
+    func testDoesNotCompostFoodThatIsEaten() {
         mockFoodDepot.expect.get().to(`return`(Kibble()))
-        mockAnimal.expect.eat(food: instance(of: Kibble.self)).to(beEaten())
+        let mockDog = MockAnimal()
+        mockDog.expect.eat(food: instance(of: Kibble.self)).to(beEaten())
 
-        caretaker.feed(animal: mockAnimal, foodType: Kibble.self)
+        caretaker.feed(animal: mockDog, foodType: Kibble.self)
+
+        mockFoodDepot.verify()
+        mockDog.verify()
+    }
+
+    func testCompostsFoodThatIsNotEaten() {
+        mockFoodDepot.expect.get()
+            .to(`return`(MeowMix()))
+            .and
+            .to(`return`(Tuna()))
+
+        mockFoodDepot.expect.compost(food: instance(of: MeowMix.self)).toBeCalled()
+
+        let mockCat = MockAnimal()
+        mockCat.expect.eat(food: any()).to(onlyEatTuna(), times: 2)
+
+        caretaker.feed(animal: mockCat, foodType: MeowMix.self)
+        caretaker.feed(animal: mockCat, foodType: Tuna.self)
+
+        mockFoodDepot.verify()
+        mockCat.verify()
     }
 }

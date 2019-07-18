@@ -2,10 +2,12 @@
 
 ## Future versions
 - [ ] Quick/Nimble integration
-- [ ] Documentation
-- [ ] Argument capture, or API for inspecting mock calls
+- [ ] Argument capture / API for persisting & inspecting mock calls
+- [ ] Automatic verification (hook into XCTestObserver to call verify() on tearDown)
+- [ ] Automatic disabling of continueAfterFailure 
 
 ## v0.0.1
+- [ ] Documentation
 - [x] Stub simple var return values
 - [x] Replace assertion failures with XCTest failure reports
 - [x] Support "always return"
