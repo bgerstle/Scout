@@ -59,4 +59,4 @@ mockExample.expect.baz().to(`return`("buz"))
 mockExample.baz() // "buz"
 ```
 
-See the Playground for more examples.
+See the [ExampleProject tests](/ExampleProject/Tests/ExampleProjectTests/Caretaker/CaretakerTests.swift) for more examples.
