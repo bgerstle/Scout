@@ -6,7 +6,19 @@ Dynamic mocking for Swift.
 ## Requirements
 - Swift 5 or greater
 
-## Quick Example
+## Installing
+### Swift Package
+Add this repo to your package's `dependencies`, similar to this repo's [Example project manifest](/ExampleProject/Package.swift).
+
+### Carthage
+There's a [workaround](https://fuller.li/posts/using-swift-package-manager-with-carthage/) for integration Swift packages using Carthage. TL;DR;
+
+- Add the project to your Cartfile
+- Use Carthage to checkout the project
+- Generate Scout's Xcode project: `cd Carthage/Checkouts/Scout && swift package generate-xcodeproj`
+- Follow [Carthage's instructions](https://github.com/Carthage/Carthage#adding-frameworks-to-an-application) to integrate Scout into your project
+
+## Getting Started
 Let's create a mock for an example interface:
 
 ```swift
