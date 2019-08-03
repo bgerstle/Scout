@@ -8,6 +8,109 @@
 
 import Foundation
 
+public struct FuncDSL {
+    let context: MockFuncContext
+    let argChecker: ArgChecker
+
+    init(context: MockFuncContext, matchers: KeyValuePairs<String, ArgMatcher>) {
+        self.init(context: context, matchers: matchers.keyValuePairArray)
+    }
+
+    init(context: MockFuncContext, matchers: [KeyValuePair<String, ArgMatcher>]) {
+        self.context = context
+        self.argChecker = ArgChecker(context: context, argMatchers: matchers)
+    }
+
+
+    /// Expect an Expectation (similar to `ExpectVarDSL#to`).
+    ///
+    ///     mockExample.expect.foo().to(`return`(0))
+    ///
+    @discardableResult
+    public func to(
+        _ expectation: Expectation,
+        _ file: StaticString = #file,
+        _ line: UInt = #line
+        ) -> FuncDSL {
+        return to(ExpectationFuncWrapper(expectation: expectation), file, line)
+    }
+
+    /// Set an expectation with a higher-order function.
+    ///
+    ///     func incrementBy(_ amount: Int) -> FuncExpectationBlock {
+    ///         return { args in
+    ///             return args.first as! Int + amount
+    ///         }
+    ///     }
+    ///     mockExample.expect.foo.to(incrementBy(1))
+    ///
+    /// - Parameters:
+    ///   - block: A function that accepts the arguments to the expected function call.
+    ///   - times: The number of times this expectation should occur.
+    /// - Returns: The DSL for further chaining.
+    @discardableResult
+    public func to(
+        _ block: @escaping FuncExpectationBlock,
+        times: Int = 1,
+        _ file: StaticString = #file,
+        _ line: UInt = #line
+        ) -> FuncDSL {
+        return to(CallFuncExpectation(block: block, times: times), file, line)
+    }
+
+    // Always call the specified higher order function (see `to(_ block:...)`).
+    public func toAlways(
+        _ block: @escaping FuncExpectationBlock,
+        _ file: StaticString = #file,
+        _ line: UInt = #line) {
+        to(AlwaysCallFuncExpectation(block: block), file, line)
+    }
+
+
+    /// Expect the function to be called, without specifying a behavior (e.g. a function
+    /// that doesn't return anything but must be called for some side effect).
+    ///
+    ///     mockExample.expect.foo().toBeCalled()
+    ///
+    /// - Parameters:
+    ///   - times: How many times it should be called.
+    /// - Returns: An expectation that verifies the function is called the specified number of times.
+    @discardableResult
+    public func toBeCalled(
+        times: UInt = 1,
+        _ file: StaticString = #file,
+        _ line: UInt = #line
+    ) -> FuncDSL {
+        let noop: FuncExpectationBlock = { _ in () }
+        (0..<times).forEach { _ in to(CallFuncExpectation(block: noop), file, line) }
+        return self
+    }
+
+
+    /// Chain expectations on a function:
+    ///
+    ///     expect.foo.to(`return`(1)).and.to(`return`(5))
+    ///
+    public var and: FuncDSL {
+        return self
+    }
+
+    @discardableResult
+    private func to(
+        _ expectation: FuncExpectation,
+        _ file: StaticString = #file,
+        _ line: UInt = #line
+    ) -> FuncDSL {
+        let wrappedExpectation = ArgCheckingFuncExpectationWrapper(
+            expectation: expectation,
+            argChecker: argChecker,
+            location: (file: file, line: line)
+        )
+        context.mock.append(expectation: wrappedExpectation, for: context.funcName)
+        return self
+    }
+}
+
 protocol MockFuncContext {
     var mock: Mock { get }
     var funcName: String { get }
@@ -43,90 +146,6 @@ public protocol FuncExpectation {
 extension FuncExpectation {
     func shouldVerify() -> Bool {
         return true
-    }
-}
-
-public struct FuncDSL {
-    let context: MockFuncContext
-    let argChecker: ArgChecker
-
-    init(context: MockFuncContext, matchers: KeyValuePairs<String, ArgMatcher>) {
-        self.init(context: context, matchers: matchers.keyValuePairArray)
-    }
-
-    init(context: MockFuncContext, matchers: [KeyValuePair<String, ArgMatcher>]) {
-        self.context = context
-        self.argChecker = ArgChecker(context: context, argMatchers: matchers)
-    }
-
-    @discardableResult
-    public func to(
-        _ expectation: FuncExpectation,
-        _ file: StaticString = #file,
-        _ line: UInt = #line
-    ) -> FuncDSL {
-        let wrappedExpectation = ArgCheckingFuncExpectationWrapper(
-            expectation: expectation,
-            argChecker: argChecker,
-            location: (file: file, line: line)
-        )
-        context.mock.append(expectation: wrappedExpectation, for: context.funcName)
-        return self
-    }
-
-    @discardableResult
-    public func toBeCalled(
-        times: UInt = 1,
-        _ file: StaticString = #file,
-        _ line: UInt = #line
-    ) -> FuncDSL {
-        let noop: FuncExpectationBlock = { _ in () }
-        (0..<times).forEach { _ in to(CallFuncExpectation(block: noop), file, line) }
-        return self
-    }
-
-    @discardableResult
-    public func to(
-        _ expectation: Expectation,
-        _ file: StaticString = #file,
-        _ line: UInt = #line
-    ) -> FuncDSL {
-        return to(ExpectationFuncWrapper(expectation: expectation), file, line)
-    }
-
-    public func toAlways(
-        _ block: @escaping FuncExpectationBlock,
-        _ file: StaticString = #file,
-        _ line: UInt = #line) {
-        to(AlwaysCallFuncExpectation(block: block), file, line)
-    }
-
-    /*
-     Set an expectation with a higher-order function that returns a function that accepts the
-     arguments to the expected function call:
-
-     expect.foo.to(incrementBy(1))
-
-     where incrementBy(1) returns a function with a single KeyValuePairs argument which contains
-     the arguments to foo.
-     */
-    @discardableResult
-    public func to(
-        _ block: @escaping FuncExpectationBlock,
-        times: Int = 1,
-        _ file: StaticString = #file,
-        _ line: UInt = #line
-    ) -> FuncDSL {
-        return to(CallFuncExpectation(block: block, times: times), file, line)
-    }
-
-    /*
-     Chain expectations on a function:
-
-     expect.foo.to(`return`(1)).and.to(`return`(5))
-    */
-    public var and: FuncDSL {
-        return self
     }
 }
 

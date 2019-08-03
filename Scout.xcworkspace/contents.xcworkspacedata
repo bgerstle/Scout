@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:Scout.playground">
+   </FileRef>
+   <FileRef
+      location = "group:ExampleProject/ExampleProject.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:Scout.xcodeproj">
    </FileRef>
 </Workspace>
