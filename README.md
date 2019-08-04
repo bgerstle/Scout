@@ -57,7 +57,9 @@ class ManualMockExampleTests : XCTestCase {
 }
 ```
 
-Scout aims to eliminate this boilerplate so tests are easier to write, while also improving readability.
+These `<func>WasCalled`  flags and `var` stubs are duplicated in every single mock you write. If you need to throw an exception, invoke a completion block, or anything more complicated, your mocks get even more convoluted. Making matters worse, none of this "mock functionality" is easy to reuse in your tests.
+
+Scout aims to remove all of this boilerplate, and in doing so, make tests easier to both read and write. This is done using a declarative, functional, and dynamic API for creating and configuring mocks. 
 
 ## Requirements
 - Swift 5 or greater
