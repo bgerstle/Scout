@@ -217,7 +217,13 @@ func incrementBy(_ amount: Int) -> FuncExpectationBlock {
 mockExample.expect.foo.to(incrementBy(1))
 ```
 
-There's also a ``throw`` expectation for when you want your mock function to throw an error. This especially comes in handy when you have more advanced behaviors to expect, like [calling a completion block](/ExampleProject/Tests/ExampleProjectTests/DataLoadable/DataLoadableResultAdapterTests.swift#L38-L43).
+This especially comes in handy when you have more advanced behaviors to expect, like [calling a completion block](/ExampleProject/Tests/ExampleProjectTests/DataLoadable/DataLoadableResultAdapterTests.swift#L38-L43).
+
+There's also a ``throw`` expectation for when you want your mock function to throw an error:
+
+```swift
+mockThrowExample.expect.someThrowingFunc.to(`throw`(SomeError())
+```
 
 Once you've set expectations on your mock, you'll need to verify that they're met.
 
