@@ -4,7 +4,7 @@ Easier, dynamic mocking for Swift.
 [![Build Status](https://travis-ci.com/bgerstle/Scout.svg?branch=master)](https://travis-ci.com/bgerstle/Scout) [![codecov](https://codecov.io/gh/bgerstle/Scout/branch/master/graph/badge.svg)](https://codecov.io/gh/bgerstle/Scout)
 
 ## Why Scout?
-Let's say we have a `TestSubject` that depends on the `Example` protocol. If you've done unit testing in Swift, you're probably all to familiar with this dance: 
+Let's say we have a `TestSubject` that depends on the `Example` protocol.
 
 ```swift
 protocol Example {
@@ -28,7 +28,7 @@ class TestSubject {
 }
 ```
 
-So, we write a `MockExample` class and a test:
+If you've done unit testing in Swift, you're probably all to familiar with this dance:
 
 ```swift
 class ManualMockExample: Example {
@@ -57,7 +57,7 @@ class ManualMockExampleTests : XCTestCase {
 }
 ```
 
-These `<func>WasCalled`  flags and `var` stubs are duplicated in every single mock you write. If you need to throw an exception, invoke a completion block, or anything more complicated, your mocks get even more convoluted. Making matters worse, none of this "mock functionality" is easy to reuse in your tests.
+These `<func>WasCalled`  flags and `var` stubs are essentially duplicated in every single mock you write. If you need to throw an exception, invoke a completion block, or anything more complicated, your mocks get even more convoluted. Making matters worse, none of this "mock functionality" is easy to reuse in your tests.
 
 Scout aims to remove all of this boilerplate, and in doing so, make tests easier to both read and write. This is done using a declarative, functional, and dynamic API for creating and configuring mocks. 
 
