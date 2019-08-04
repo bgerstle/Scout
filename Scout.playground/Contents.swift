@@ -1,4 +1,4 @@
-import Foundation
+import XCTest
 import Scout
 
 // Now for some fun with XCTest in playgrounds...
