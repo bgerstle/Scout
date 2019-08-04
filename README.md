@@ -4,7 +4,7 @@ Easier, dynamic mocking for Swift.
 [![Build Status](https://travis-ci.com/bgerstle/Scout.svg?branch=master)](https://travis-ci.com/bgerstle/Scout) [![codecov](https://codecov.io/gh/bgerstle/Scout/branch/master/graph/badge.svg)](https://codecov.io/gh/bgerstle/Scout)
 
 ## Why Scout?
-If you've done unit testing in Swift, you're probably all to familiar with this dance: we have a `TestSubject` that depends on the `Example` protocol. 
+Let's say we have a `TestSubject` that depends on the `Example` protocol. If you've done unit testing in Swift, you're probably all to familiar with this dance: 
 
 ```swift
 protocol Example {
