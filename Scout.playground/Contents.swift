@@ -35,8 +35,7 @@ func runTests(inClass testClass: XCTestCase.Type) -> XCTestRun {
  1. Implement the `Mockable` protocol by adding a `mock` member to your mock class
  1. Implement your protocol, using `mock` as the underlying implementation
 
- For example, if we are building something that depends on the `Example` interface, we must create a `MockExample`
- to test it:
+ Let's say we're testing the `TestSubject` class, which depends on the `Example` interface:
 */
 
 protocol Example {
@@ -59,7 +58,7 @@ class TestSubject {
     }
 }
 
-//: Normally, we'd write something like this:
+//: Normally, we'd write a custom Mock that looks something like this:
 
 class ManualMockExample: Example {
     var foo: String
@@ -89,11 +88,11 @@ class ManualMockExampleTests : XCTestCase {
 runTests(inClass: ManualMockExampleTests.self)
 
 /*:
- That's all well and good for a couple of mocks, but it gets old after a while.
+ That's all well and good for a couple of mocks, but can get repetitive (and error prone) as you
+ start writing more mocks for your tests. This is the problem Scout aims to solve. To see how, we're
+ going to create another mock `Example`. First, we'll define our mock class, `MockExample`, and
+ declare its conformance to the `Mockable` protocol:
 */
-
-
-//: First, we'll declare our `MockExample` and make it `Mockable`:
 
 class MockExample : Mockable {
     let mock = Mock()
@@ -101,7 +100,8 @@ class MockExample : Mockable {
 
 /*:
  Now let's implement the `Example` protocol, but use `mock` to do the heavy lifting.
- To implement the `foo` requirement of the `Example` protocol, we'll use `mock.get` to get expected values of `foo`:
+ To implement the `foo` requirement of the `Example` protocol, we'll use `mock.get` to get
+ expected values of `foo`:
 */
 extension MockExample {
     var foo: String {
@@ -113,7 +113,6 @@ extension MockExample {
 
 /*:
  For `baz()`, we'll use `mock.call` to return any expected values (or side effects).
- (We'll talk about why `try!` is there later.)
 */
 extension MockExample {
     func baz() {
@@ -121,21 +120,24 @@ extension MockExample {
     }
 }
 
-//: Now that we've implemented `foo` and `baz()`, we can make our conformance to the `Example` protocol official:
+/*:
+ Now that we've implemented `foo` and `baz()`, we can make our conformance to the `Example`
+ protocol official:
+ */
 extension MockExample : Example {}
 
 /*:
- Notice we didn't need to (re)implement a bunch of logic for checking whether `foo` was used or
- setting internal flags to indicate `baz()` was called? The `mock` does all of that for us, and will
- record a test failure if something goes wrong. This is done by configuring it with expectations.
+ Notice the lack of other `var`s and flags inside `MockExample`. All the logic about what to return
+ or which functions were called is taken care of by `mock`—including failure reporting if something
+ goes wrong. This is accomplished by configuring the mock with expectations.
 
- ### Configuring Mocks
+ ### Setting Expectations
 
  In general, mocks help us verify that our test subjects behave as expected under certain conditions.
- `Mock` allows us to set up these conditions using the `expect` domain-specific language (DSL). Let's go back to our `TestSubject` from earlier, and see how we can test it using the `MockExample` we created:
+ `Mock` allows us to set up these conditions using the `expect` domain-specific language (DSL).
+ Let's write some more tests for our `TestSubject`, using our new `MockExample` to simulate important
+ scenarios:
 */
-
-import XCTest
 
 class TestSubjectTests : XCTestCase {
     var mockExample: MockExample!
@@ -170,7 +172,11 @@ class TestSubjectTests : XCTestCase {
 
 runTests(inClass: TestSubjectTests.self)
 
-//: Those look nice, but what happens if there's a bug in the test subject?
+/*:
+ Instead of setting values on the mock like we did last time, we tell it to `expect` vars to return
+ values and for specific functions to be called. You can see this in action if we force the tests
+ to fail:
+ */
 
 class BrokenSubjectTests : TestSubjectTests {
     class BrokenTestSubject : TestSubject {
@@ -189,7 +195,28 @@ class BrokenSubjectTests : TestSubjectTests {
 runTests(inClass: BrokenSubjectTests.self)
 
 /*:
- Hopefully that's enough to get you started writing and using mocks with Scout. Check out the
- ExampleProject tests and Scout's own tests for more examples of setting different kinds of
- expectations with different kinds of functions. Happy testing!
+ Now that you've seen what Scout can do, why don't you make some changes to the
+ `Example` protocol and the `MockExample` class? You can try creating some expectations
+ and seeing how they behave below:
+ */
+
+let mockExample = MockExample()
+
+mockExample.expect.foo.to(`return`("foo"))
+mockExample.foo
+
+func write(logMessage: String) -> FuncExpectationBlock {
+    return { _ in
+        print(logMessage)
+    }
+}
+mockExample.expect.baz().to(write(logMessage: "Hello world"))
+mockExample.baz()
+
+/*:
+ You can see more examples of how to use Scout in the ExampleProject tests and
+ Scout's own tests. The "Usage" section of the README has some documentation
+ in case you forget how a specific method works.
+
+ Happy testing!
  */
