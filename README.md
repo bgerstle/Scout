@@ -28,7 +28,7 @@ class TestSubject {
 }
 ```
 
-If you've done unit testing in Swift, you're probably all to familiar with this dance:
+If you've done unit testing in Swift, you're probably all too familiar with this dance:
 
 ```swift
 class ManualMockExample: Example {
@@ -57,7 +57,7 @@ class ManualMockExampleTests : XCTestCase {
 }
 ```
 
-These `<func>WasCalled`  flags and `var` stubs are essentially duplicated in every single mock you write. If you need to throw an exception, invoke a completion block, or anything more complicated, your mocks get even more convoluted. Making matters worse, none of this "mock functionality" is easy to reuse in your tests.
+These `<func>WasCalled`  flags and `var` stubs are likely duplicated in every mock you write. If you need to throw an exception, invoke a completion block, or anything more complicated, your mocks get even more convoluted. Making matters worse, none of this "mock functionality" is easy to reuse across tests.
 
 Scout aims to remove all of this boilerplate, and in doing so, make tests easier to both read and write. This is done using a declarative, functional, and dynamic API for creating and configuring mocks. 
 
@@ -200,24 +200,24 @@ In this case, the expectation is to "return 4." What you can expect varies based
 #### Function Expectations
 [`ExpectFuncDSL`](/Sources/Scout/Expect/ExpectFuncDSL.swift) provides the expectation-setting DSL for function calls. It has two different signatures:
 
-One similar to var expectations: 
+The `var` expectations DSL: 
 
 ```swift
 mockExample.to(`return`("foo"))
 ```
 
-And another that's functional:
+And another that accepts function-specific exepctations, which are just functions with the `FuncExpectationBlock` signature. You can write your own:
 
 ```swift
 func incrementBy(_ amount: Int) -> FuncExpectationBlock {
-    return { args in
+    return { (args: KeyValuePairs<String, Any?>) in
         return args.first as! Int + amount
     }
 }
 mockExample.expect.foo.to(incrementBy(1))
 ```
 
-The functional one is useful when you have more advanced behaviors to expect, like [calling a completion block](/ExampleProject/Tests/ExampleProjectTests/DataLoadable/DataLoadableResultAdapterTests.swift#L38-L43).
+There's also a ``throw`` expectation for when you want your mock function to throw an error. This especially comes in handy when you have more advanced behaviors to expect, like [calling a completion block](/ExampleProject/Tests/ExampleProjectTests/DataLoadable/DataLoadableResultAdapterTests.swift#L38-L43).
 
 Once you've set expectations on your mock, you'll need to verify that they're met.
 

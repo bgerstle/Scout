@@ -78,7 +78,7 @@ class MockAssertionTests : ScoutTestCase {
     }
 
     func testAssertRemainingFuncCallExpectationsWithRemainingCall() {
-        mockExample.expect.voidNullaryThrows().to(throwExampleError)
+        mockExample.expect.voidNullaryThrows().to(`throw`(ExampleError()))
 
         assertFails { mockExample.verify() }
     }

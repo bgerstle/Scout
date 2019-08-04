@@ -111,6 +111,22 @@ public struct FuncDSL {
     }
 }
 
+
+/// Expect a function to throw an error.
+///
+///     mockThrowsExample.expect.throwingFunc.to(`throw`(SomeError()))
+///
+/// - Parameter error: The error to throw, constructed lazily.
+/// - Returns: A function that throws the specified error.
+public func `throw`(_ error: @escaping @autoclosure () -> Error) -> FuncExpectationBlock {
+    return { _ in
+        throw error()
+    }
+}
+
+// Alias in case backticks aren't desired.
+let throwError = `throw`
+
 protocol MockFuncContext {
     var mock: Mock { get }
     var funcName: String { get }

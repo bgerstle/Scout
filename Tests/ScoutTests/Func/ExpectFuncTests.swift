@@ -22,7 +22,7 @@ class ExpectFuncTests : ScoutTestCase {
     }
 
     func testFuncThrows() {
-        mockExample.expect.voidNullaryThrows().to(throwExampleError)
+        mockExample.expect.voidNullaryThrows().to(`throw`(ExampleError()))
 
         XCTAssertThrowsError(try mockExample.voidNullaryThrows(), "Throws example error") { error in
             XCTAssertTrue(error is ExampleError)
